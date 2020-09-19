@@ -8,7 +8,8 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
     <p>Enter your prediction</p>
     
     <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange}></input>
-    <select name="Team" value="MI" onChange={handleTeamChange} >
+    <select name="Team" defaultValue="select" onChange={handleTeamChange} >
+        <option value ="select" >--Select--</option>
         <option value="MI">MI</option>
         <option value="CSK">CSK</option>
     </select>
