@@ -55,31 +55,23 @@ class MainTable extends React.Component {
   }
 
   componentDidMount(){
-    // render(EntryForm,document.getElementById("form1"))
-    // this.render()
-    // console.log("On mount",this.state.nameInput,this.state.teamInput)
-    request.open('GET', 'https://reacttestipl.azurewebsites.net/entries', true)
-    request.onload = function () {
-      // Begin accessing JSON data here
-      console.log("Entries recieved from backed")
-      var data = JSON.parse(this.response)
+    const apiUrl = '/api/entries';
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('This is your data', data);
+        this.setState({
+          return{
+            ent : data,
+            nameInput : '',
+            teamInput : ''
 
-      if (request.status >= 200 && request.status < 400) {
-         this.setState({
-           return{
-             ent : data,
-             nameInput : '',
-             teamInput : ''
+          }
+        })
+      } );
 
-         }
-         })
-      } else {
-        console.log('error')
-      }
-    }
-    
-    // Send request
-    request.send()
+
+
     
   }
 
