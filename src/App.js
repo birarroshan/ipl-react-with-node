@@ -58,7 +58,7 @@ class MainTable extends React.Component {
     // render(EntryForm,document.getElementById("form1"))
     // this.render()
     // console.log("On mount",this.state.nameInput,this.state.teamInput)
-    request.open('GET', '/entries', true)
+    request.open('GET', 'https://reacttestipl.azurewebsites.net/entries', true)
     request.onload = function () {
       // Begin accessing JSON data here
       console.log("Entries recieved from backed")
