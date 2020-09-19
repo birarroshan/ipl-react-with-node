@@ -3,6 +3,7 @@ import styles from './EntryForm.module.css';
 
 
 const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamChange}) => (
+  
   <div className={styles.EntryForm}>
     <h3>MI vs CSK</h3>
     <p>Enter your prediction</p>
@@ -13,9 +14,10 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
         <option value="MI">MI</option>
         <option value="CSK">CSK</option>
     </select>
-    <div><button type="submit" disabled={ (teamInput=='--select--' || teamInput=="") && nameInput==""   } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
+    <div><button type="submit" disabled={ teamInput=='--select--' || teamInput=="" || nameInput==""   } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
     
   </div>
+
 );
 
 EntryForm.propTypes = {};
