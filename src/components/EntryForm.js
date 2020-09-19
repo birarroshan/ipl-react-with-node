@@ -13,7 +13,7 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
         <option value="MI">MI</option>
         <option value="CSK">CSK</option>
     </select>
-    <div><button type="submit" onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
+    <div><button type="submit" disabled={ (teamInput=='--select--' || teamInput=="") && nameInput==""   } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
     
   </div>
 );
