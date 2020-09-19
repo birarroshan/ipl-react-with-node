@@ -4,6 +4,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
+const { type } = require('os');
+const { json } = require('body-parser');
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -21,7 +23,7 @@ app.use(helmet());
 app.use(logger('dev'));
 app.use('/public', express.static('public'));
 
-entries = [{"name":"default","team":"defaultT"}]
+var  entries = [{"name":"default","team":"defaultT"}]
 app.use(express.static(path.join(__dirname, 'build')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
@@ -30,6 +32,15 @@ app.get('/', (req, res) => {
 
 app.get('/api/entries',(req,res) =>{
   res.send(entries);
+})
+
+app.post('/api/entries',(req,res) =>{
+  var e = req.body;
+  console.log(e,type(e));
+  entries.push(e); 
+  res.send(entries)
+  
+  // res.send(entries);
 })
 
 const port = normalizePort(process.env.PORT || 3000);

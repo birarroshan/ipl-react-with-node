@@ -79,27 +79,42 @@ class MainTable extends React.Component {
   } 
 
   formSubmit = (name,team) =>{
-     console.log("How this is clicking",name,team)
+    console.log("Before",this.state);
     //  const entries = this.state.ent;
+    
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, team : team })
+  };
+  fetch('/api/entries', requestOptions)
+      .then(response => response.json())
+      .then(data => 
+        
+        this.setState((state)=> {
+          let list = state.ent
+          if( list.some(item=> item.name.toLowerCase()===name.toLowerCase())){
+            var idx = list.findIndex(item=>item.name.toLowerCase() === name.toLowerCase())
+             list[idx] = { name: list[idx].name,team: team}
+           //  item.teamInput = state.teamInput
+          }
+          else{
+            list = [...state.ent,{"name":state.nameInput,"team":state.teamInput}];
+          }
+         return {
+           ent : list,
+           nameInput : '',
+           teamInput : ''
+         }
+        })
+         
+        
+        );
+    
     //  entries.push({name:team});
-    console.log("Before",this.state)
-     this.setState((state)=> {
-       let list = state.ent
-       if( list.some(item=> item.name.toLowerCase()===name.toLowerCase())){
-         var idx = list.findIndex(item=>item.name.toLowerCase() === name.toLowerCase())
-          list[idx] = { name: list[idx].name,team: team}
-        //  item.teamInput = state.teamInput
-       }
-       else{
-         list = [...state.ent,{"name":state.nameInput,"team":state.teamInput}];
-       }
-      return {
-        ent : list,
-        nameInput : '',
-        teamInput : ''
-      }
-     })
-       
+
+    
+
      console.log("After",this.state)
   }
 
