@@ -70,7 +70,7 @@ class MainTable extends React.Component {
     const entries = props.entries
     console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
-       <tr key={i}><td>{entry.name}</td><td>{entry.team}</td></tr>
+       <tr key={i}><td>{entry.name}</td><td>{entry.team}</td><td>0</td> </tr>
      )
     
     return (
@@ -126,7 +126,7 @@ class MainTable extends React.Component {
         <br />
         <table >
           <thead >
-          <tr><th >Name</th><th >Team</th></tr>
+          <tr><th >Name</th><th >Team</th><th>Score</th></tr>
           </thead>
           <this.TableRow entries={this.state.ent}></this.TableRow>
           
