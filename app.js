@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const { type } = require('os');
 const { json } = require('body-parser');
+const { ENETDOWN } = require('constants');
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -37,7 +38,15 @@ app.get('/api/entries',(req,res) =>{
 app.post('/api/entries',(req,res) =>{
   var e = req.body;
   console.log(e,type(e));
-  entries.push(e); 
+  
+  if (entries.some(item=>item.name == e.name)){
+    console.log("Duplicate");
+    const idx = entries.findIndex(item => item.name == e.name)
+    console.log("Duplicate id ",idx);
+    entries[idx] = e
+  }else {
+     entries.push(e); 
+  }
   res.send(entries)
   
   // res.send(entries);
