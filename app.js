@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(helmet());
 app.use(logger('dev'));
-
+app.use('/public', express.static('public'));
 
 entries = [{"name":"default","team":"defaultT"}]
 app.use(express.static(path.join(__dirname, 'build')));
