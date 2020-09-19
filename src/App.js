@@ -2,6 +2,9 @@ import React from 'react';
 import logo from './ipl2020.jfif';
 import './App.css';
 import EntryForm from './components/EntryForm';
+import { request } from 'express';
+import XMLHttpRequest from XMLHttpRequest
+var request = new XMLHttpRequest()
 
 function App() {
   return (
@@ -55,6 +58,29 @@ class MainTable extends React.Component {
     // render(EntryForm,document.getElementById("form1"))
     // this.render()
     // console.log("On mount",this.state.nameInput,this.state.teamInput)
+    request.open('GET', '/entries', true)
+    request.onload = function () {
+      // Begin accessing JSON data here
+      console.log("Entries recieved from backed")
+      var data = JSON.parse(this.response)
+
+      if (request.status >= 200 && request.status < 400) {
+         this.setState({
+           return{
+             ent : data,
+             nameInput : '',
+             teamInput : ''
+
+         }
+         })
+      } else {
+        console.log('error')
+      }
+    }
+    
+    // Send request
+    request.send()
+    
   }
 
 

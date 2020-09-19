@@ -20,15 +20,17 @@ app.use(bodyParser.json());
 app.use(helmet());
 app.use(logger('dev'));
 
-// Add your API routes under the route `/api`
-// const api = require('./api');
-// app.use('/api', api);
 
-// Serve the React application
+entries = [{"name":"default","team":"defaultT"}]
 app.use(express.static(path.join(__dirname, 'build')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
+
+
+app.get('/entries',(req,res) =>{
+  res.send(entries);
+})
 
 const port = normalizePort(process.env.PORT || 3000);
 app.listen(port, () => {
