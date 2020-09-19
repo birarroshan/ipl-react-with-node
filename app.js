@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/entries',(req,res) =>{
+app.get('/api/entries',(req,res) =>{
   res.send(entries);
 })
 
