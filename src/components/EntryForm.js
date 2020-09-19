@@ -8,9 +8,9 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
     <p>Enter your prediction</p>
     
     <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange}></input>
-    <select name="Team" value={teamInput} onChange={handleTeamChange} >
-        <option value={teamInput}>MI</option>
-        <option value={teamInput}>CSK</option>
+    <select name="Team" value="MI" onChange={handleTeamChange} >
+        <option value="MI">MI</option>
+        <option value="CSK">CSK</option>
     </select>
     <div><button type="submit" onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
     
