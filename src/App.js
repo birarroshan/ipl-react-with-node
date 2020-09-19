@@ -2,9 +2,7 @@ import React from 'react';
 import logo from './ipl2020.jfif';
 import './App.css';
 import EntryForm from './components/EntryForm';
-import { request } from 'express';
-import XMLHttpRequest from XMLHttpRequest
-var request = new XMLHttpRequest()
+
 
 function App() {
   return (
@@ -19,14 +17,9 @@ function App() {
       </div>
     </div>
     
-  );
+  )
 }
-``
 
-
-function WelcomeHeader(props){
- return <p>Hello, {props.name}</p>;
-}
 
 class MainTable extends React.Component {
   constructor(props){
@@ -53,14 +46,14 @@ class MainTable extends React.Component {
     })
     console.log(this.state.teamInput)
   }
-
+  
   componentDidMount(){
     const apiUrl = '/api/entries';
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
         console.log('This is your data', data);
-        this.setState({
+        this.setState((state)=>{
           return{
             ent : data,
             nameInput : '',
@@ -68,11 +61,7 @@ class MainTable extends React.Component {
 
           }
         })
-      } );
-
-
-
-    
+      } )
   }
 
 
