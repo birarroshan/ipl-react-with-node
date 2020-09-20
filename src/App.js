@@ -112,9 +112,14 @@ class MainTable extends React.Component {
   TableRow(props) {  
     // console.log("Tbale row",props)
     const entries = props.entries
+    entries.array.forEach(element => {
+      if (element.team != ""){
+        element. team = 'Voted'
+      }
+    });
     console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
-       <tr key={i}><td>{entry.name}</td><td>{entry.team}</td><td>0</td> </tr>
+       <tr key={i}><td>{entry.name}</td><td>{ }</td><td>0</td> </tr>
      )
     
     return (
