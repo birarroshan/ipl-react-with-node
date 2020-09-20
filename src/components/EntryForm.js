@@ -11,7 +11,7 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
     <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange}></input>
     <select name="Team" value={teamInput} onChange={handleTeamChange} >
         <option value ="select" >--Select--</option>
-        <option value={team2}>{team1}</option>
+        <option value={team1}>{team1}</option>
         <option value={team2}>{team2}</option>
     </select>
     <div><button type="submit" disabled={ teamInput==='--select--' || teamInput==='' || nameInput===''  } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>

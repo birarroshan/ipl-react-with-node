@@ -74,9 +74,8 @@ class MainTable extends React.Component {
     
           // First request done - 
            
-            return fetch(apiUrl);
-          })
-             .then((response) => response.json())
+            return fetch(apiUrl)
+           .then((response) => response.json())
              .then((data) => {
              console.log('This is entries data', data);
                 this.setState((state)=>{
@@ -91,8 +90,7 @@ class MainTable extends React.Component {
 
 
                    // Second Call done 
-                   return   fetch(apiUrlMatch);
-                  })
+                   return   fetch(apiUrlMatch)
                    .then((response) => response.json())
                    .then((data) => {
                      console.log('This is Match Data', data);
@@ -105,9 +103,9 @@ class MainTable extends React.Component {
                          team2 : data.team2 
                        }
                      })
-                   } )
-             
-      
+                   })
+            })
+          })
   }
 
 
