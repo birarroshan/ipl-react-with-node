@@ -108,7 +108,7 @@ app.get('/api/players',(req,res)=>{
 
 })
 
-var matchID = 2
+var matchID = 3
 app.get('/api/matches',(req,res)=>{
   var result = "";
   d = new Date(Date.now())
