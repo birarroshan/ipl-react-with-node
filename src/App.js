@@ -127,7 +127,7 @@ class MainTable extends React.Component {
     console.log("Before",this.state);
     //  const entries = this.state.ent;
     var date = new Date();
-    if (date.getHours()<19 ){
+    if (date.getHours()<20 ){
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
