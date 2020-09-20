@@ -79,7 +79,7 @@ app.get('/api/players',(req,res)=>{
             console.log("Duplicate");
             const idx = entries.findIndex(item => item.name == player)
             console.log("Duplicate id ",idx);
-            entries[idx] = {name:player,team:"",score:0}
+            entries[idx] = {name:player,team: item.team,score:0}
           }else {
              entries.push({name:player,team:"",score:0}); 
           }
