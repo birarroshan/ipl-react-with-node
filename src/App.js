@@ -137,17 +137,17 @@ class MainTable extends React.Component {
       .then(data => 
         
         this.setState((state)=> {
-          let list = state.ent
-          if( list.some(item=> item.name.toLowerCase()===name.toLowerCase())){
-            var idx = list.findIndex(item=>item.name.toLowerCase() === name.toLowerCase())
-             list[idx] = { name: list[idx].name,team: team}
-           //  item.teamInput = state.teamInput
-          }
-          else{
-            list = [...state.ent,{"name":state.nameInput,"team":state.teamInput}];
-          }
+          // let list = data
+          // if( list.some(item=> item.name.toLowerCase()===name.toLowerCase())){
+          //   var idx = list.findIndex(item=>item.name.toLowerCase() === name.toLowerCase())
+          //    list[idx] = { name: list[idx].name,team: team}
+          //  //  item.teamInput = state.teamInput
+          // }
+          // else{
+          //   list = [...state.ent,{"name":state.nameInput,"team":state.teamInput}];
+          // }
          return {
-           ent : list,
+           ent : data,
            nameInput : '',
            teamInput : '',
            team1 : state.team1,
