@@ -7,6 +7,7 @@ const logger = require('morgan');
 const { type } = require('os');
 const { json } = require('body-parser');
 const { ENETDOWN } = require('constants');
+const { request } = require('express');
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -32,16 +33,16 @@ var TYPES = require('tedious').TYPES;
 
 // Create connection to database
 var config = {
-  server: 'uenha-dfsql0004.database.windows.net',
+  server:    process.env.server_name,//'uenha-dfsql0004.database.windows.net',
   authentication: {
       type: 'default',
       options: {
-          userName: 'capd_admin', // update me
-          password: 'Password!@' // update me
+          userName:  process.env.user_name,//'capd_admin', // update me
+          password: process.env.password,//'Password!@' // update me
       }
   },
   options: {
-      database: 'CAPDMartQAGen2'
+      database: process.env.db_name
   }
 }
 var connection = new Connection(config);
@@ -55,14 +56,14 @@ connection.on('connect', function(err) {
   }
 });
 
-
-app.use('/api/matches',(req,res)=>{
+var matchID = ""
+app.get('/api/matches',(req,res)=>{
   var result = "";
   d = new Date(Date.now())
 
-  var query = 'SELECT team1,team2 FROM dbo.matches where Mdate = \''+ d.toISOString().substring(0, 10)+'\';';
+  var query = 'SELECT matchID,team1,team2 FROM dbo.matches where Mdate = \''+ d.toISOString().substring(0, 10)+'\';';
   console.log(query);
-  request = new Request(
+  requestGet = new Request(
     query,
     function(err, rowCount, rows) {
     if (err) {
@@ -70,11 +71,13 @@ app.use('/api/matches',(req,res)=>{
     } else {
         console.log(rowCount + ' row(s) returned');
         teams = result.split(" ");
-        res.send({team1 : teams[0],team2 : teams[1]})
+        matchID = teams[0];
+
+        res.send({team1 : teams[1],team2 : teams[2]});
     }
     });
     
-    request.on('row', function(columns) {
+    requestGet.on('row', function(columns) {
         columns.forEach(function(column) {
             if (column.value === null) {
                 console.log('NULL');
@@ -87,7 +90,7 @@ app.use('/api/matches',(req,res)=>{
     });
 
     // Execute SQL statement
-    connection.execSql(request);
+    connection.execSql(requestGet);
     // res.send(result)
 })
 
@@ -99,6 +102,42 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
+
+app.get('/api/submit/:winner',(req,res)=>{
+  // var query = 'INSER into matchscore values('+matchID+','','')'
+  var win = req.params.winner
+  var q2  = ""
+  var tscore = 10*entries.length
+  winners = 0;
+  entries.forEach((item)=>{
+   
+     console.log("Item - ", item);
+     if (item.team == win) {
+      item.score = 10;
+      winners = winners+1;
+      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'replace_this\');'
+     }  else {
+      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'0\');'
+     }
+        
+      })
+      tscore =   tscore/winners;
+      q2 = q2.replace(/replace_this/g, tscore.toString())
+
+        console.log("INsert q ",q2)
+        requestInsert = new Request(
+          q2,
+          function(err, rowCount, rows) {
+          if (err) {
+              console.log("Error");
+          } else {
+              console.log("Query executed");
+          }
+          });
+         connection.execSql(requestInsert);
+    
+  
+})
 
 app.get('/api/entries',(req,res) =>{
   res.send(entries);
@@ -112,9 +151,9 @@ app.post('/api/entries',(req,res) =>{
     console.log("Duplicate");
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
-    entries[idx] = e
+    entries[idx] = {name:e.name,team:e.team,score:0}
   }else {
-     entries.push(e); 
+     entries.push({name:e.name,team:e.team,score:0}); 
   }
   res.send(entries)
   
