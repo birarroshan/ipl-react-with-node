@@ -55,6 +55,22 @@ class MainTable extends React.Component {
   }
   
   componentDidMount(){
+    const apiUrlPlayer = '/api/players';
+      fetch(apiUrlPlayer)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('This is your data', data);
+          this.setState((state)=>{
+            return{
+              ...this.state.ent,
+              ...this.state.nameInput,
+              ...this.state.teamInput,
+              team1 : data.team1,
+              team2 : data.team2 
+            }
+          })
+        } )
+        
     const apiUrl = '/api/entries';
     fetch(apiUrl)
       .then((response) => response.json())
@@ -88,21 +104,7 @@ class MainTable extends React.Component {
         })
       } )
 
-      const apiUrlPlayer = '/api/players';
-      fetch(apiUrlPlayer)
-        .then((response) => response.json())
-        .then((data) => {
-          console.log('This is your data', data);
-          this.setState((state)=>{
-            return{
-              ...this.state.ent,
-              ...this.state.nameInput,
-              ...this.state.teamInput,
-              team1 : data.team1,
-              team2 : data.team2 
-            }
-          })
-        } )
+      
   }
 
 
