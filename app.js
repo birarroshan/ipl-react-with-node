@@ -108,7 +108,7 @@ app.get('/api/players',(req,res)=>{
 
 })
 
-var matchID = 3
+var matchID = parseInt(process.env.match_id)
 app.get('/api/matches',(req,res)=>{
   var result = "";
   d = new Date(Date.now())
@@ -189,7 +189,7 @@ app.get('/api/submit/:winner',(req,res)=>{
           } else {
               console.log("Query executed");
               matchID = matchID+1
-              res.send({result : "Query Executed"})
+              res.send({result : "Query Executed", score:tscore,query:q2})
           }
           });
          connection.execSql(requestInsert);
