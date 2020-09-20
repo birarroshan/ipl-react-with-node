@@ -56,10 +56,12 @@ class MainTable extends React.Component {
   
   componentDidMount(){
     const apiUrlPlayer = '/api/players';
+    const apiUrl = '/api/entries';
+    const apiUrlMatch = '/api/matches';
       fetch(apiUrlPlayer)
         .then((response) => response.json())
         .then((data) => {
-          console.log('This is your data', data);
+          console.log('This is player data', data);
           this.setState((state)=>{
             return{
               ...this.state.ent,
@@ -69,41 +71,42 @@ class MainTable extends React.Component {
               team2 : data.team2 
             }
           })
-        } )
-        
-    const apiUrl = '/api/entries';
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('This is your data', data);
-        this.setState((state)=>{
-          return{
-            ...this.state.team1,
-           ...this.state.team2,
-            ent : data,
-            nameInput : '',
-            teamInput : ''
+    
+          // First request done - 
+           
+            return fetch(apiUrl);
+          })
+             .then((response) => response.json())
+             .then((data) => {
+             console.log('This is entries data', data);
+                this.setState((state)=>{
+                  return{
+                       ...this.state.team1,
+                       ...this.state.team2,
+                       ent : data,
+                       nameInput : '',
+                       teamInput : ''
+                   }
+                   })
 
-          }
-        })
-      } )
 
-    const apiUrlMatch = '/api/matches';
-    fetch(apiUrlMatch)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log('This is your data', data);
-        this.setState((state)=>{
-          return{
-            ...this.state.ent,
-            ...this.state.nameInput,
-            ...this.state.teamInput,
-            team1 : data.team1,
-            team2 : data.team2 
-          }
-        })
-      } )
-
+                   // Second Call done 
+                   return   fetch(apiUrlMatch);
+                  })
+                   .then((response) => response.json())
+                   .then((data) => {
+                     console.log('This is Match Data', data);
+                     this.setState((state)=>{
+                       return{
+                         ...this.state.ent,
+                         ...this.state.nameInput,
+                         ...this.state.teamInput,
+                         team1 : data.team1,
+                         team2 : data.team2 
+                       }
+                     })
+                   } )
+             
       
   }
 
