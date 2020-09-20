@@ -26,14 +26,19 @@ class MainTable extends React.Component {
     super(props)
     this.state = { ent : [ ] ,
                   nameInput : "",
-                  teamInput : ""
+                  teamInput : "",
+                  team1 : "",
+                  team2 : ""
               }
 
   }
+
   handleNameChange = (e)  => {
     this.setState({
       ...this.state.ent,
       ...this.state.teamInput,
+      ...this.state.team1,
+      ...this.state.team2,
       nameInput : e.target.value
     })
     console.log(this.state.nameInput)
@@ -42,6 +47,8 @@ class MainTable extends React.Component {
     this.setState({
       ...this.state.ent,
       ...this.state.nameInput,
+      ...this.state.team1,
+      ...this.state.team2,
       teamInput : e.target.value
     })
     console.log(this.state.teamInput)
@@ -55,10 +62,28 @@ class MainTable extends React.Component {
         console.log('This is your data', data);
         this.setState((state)=>{
           return{
+            ...this.state.team1,
+           ...this.state.team2,
             ent : data,
             nameInput : '',
             teamInput : ''
 
+          }
+        })
+      } )
+
+    apiUrl = '/api/matches';
+    fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('This is your data', data);
+        this.setState((state)=>{
+          return{
+            ...this.state.ent,
+            ...this.state.nameInput,
+            ...this.state.teamInput,
+            team1 : data.team1,
+            team2 : data.team2 
           }
         })
       } )
@@ -104,7 +129,9 @@ class MainTable extends React.Component {
          return {
            ent : list,
            nameInput : '',
-           teamInput : ''
+           teamInput : '',
+           team1 : state.team1,
+           team2 : state.team2
          }
         })
          
@@ -121,7 +148,8 @@ class MainTable extends React.Component {
   render(){
     return (
       <div>
-       <EntryForm formSubmit={this.formSubmit} nameInput={this.state.nameInput} teamInput={this.state.teamInput}  handleNameChange={this.handleNameChange} handleTeamChange={this.handleTeamChange}></EntryForm>
+       <EntryForm formSubmit={this.formSubmit} nameInput={this.state.nameInput} teamInput={this.state.teamInput}  handleNameChange={this.handleNameChange} handleTeamChange={this.handleTeamChange} 
+       team1={this.state.team1}   team2={this.state.team2}></EntryForm>
         <br />
         <br />
         <table >
