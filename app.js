@@ -8,6 +8,7 @@ const { type } = require('os');
 const { json } = require('body-parser');
 const { ENETDOWN } = require('constants');
 const { request } = require('express');
+const { resolve } = require('path');
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -56,22 +57,74 @@ connection.on('connect', function(err) {
   }
 });
 
-var matchID = ""
+app.get('/api/players',(req,res)=>{
+
+  var result = "";
+  var queryPlayer = 'SELECT player FROM dbo.iplTest ;';
+  console.log(queryPlayer);
+  requestGetPlayer = new Request(
+    queryPlayer,
+    function(err, rowCount, rows) {
+    if (err) {
+        console.log(err)
+         res.sendStatus(400)
+        // reject()
+    } 
+    else {
+        console.log(rowCount + ' row(s) returned');
+        players = result.split(" ");
+        players.forEach((player)=>{
+          if(player!=""){
+          if (entries.some(item=>item.name == player)){
+            console.log("Duplicate");
+            const idx = entries.findIndex(item => item.name == player)
+            console.log("Duplicate id ",idx);
+            entries[idx] = {name:player,team:"",score:0}
+          }else {
+             entries.push({name:player,team:"",score:0}); 
+          }
+        }
+        })
+        // resolve();
+
+        res.send(entries);
+     }
+    }
+  );
+    
+    requestGetPlayer.on('row', function(columns) {
+        columns.forEach(function(column) {
+            if (column.value === null) {
+                console.log('NULL');
+            } else {
+                result += column.value + " ";
+            }
+        });
+        console.log(result);
+        // result = "";
+    });
+    
+    connection.execSql(requestGetPlayer);
+
+})
+
+var matchID = 2
 app.get('/api/matches',(req,res)=>{
   var result = "";
   d = new Date(Date.now())
-
-  var query = 'SELECT matchID,team1,team2 FROM dbo.matches where Mdate = \''+ d.toISOString().substring(0, 10)+'\';';
+  
+  var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
   console.log(query);
   requestGet = new Request(
     query,
     function(err, rowCount, rows) {
     if (err) {
         console.log(err)
+        res.sendStatus(400)
     } else {
         console.log(rowCount + ' row(s) returned');
         teams = result.split(" ");
-        matchID = teams[0];
+        // matchID = teams[0];
 
         res.send({team1 : teams[1],team2 : teams[2]});
     }
@@ -90,8 +143,10 @@ app.get('/api/matches',(req,res)=>{
     });
 
     // Execute SQL statement
-    connection.execSql(requestGet);
-    // res.send(result)
+   
+      connection.execSql(requestGet);
+   
+    
 })
 
 
@@ -121,7 +176,7 @@ app.get('/api/submit/:winner',(req,res)=>{
      }
         
       })
-      tscore =   tscore/winners;
+      tscore =   tscore/(entries.length-winners);
       q2 = q2.replace(/replace_this/g, tscore.toString())
 
         console.log("INsert q ",q2)
@@ -130,8 +185,11 @@ app.get('/api/submit/:winner',(req,res)=>{
           function(err, rowCount, rows) {
           if (err) {
               console.log("Error");
+              res.sendStatus(400)
           } else {
               console.log("Query executed");
+              matchID = matchID+1
+              res.send({result : "Query Executed"})
           }
           });
          connection.execSql(requestInsert);
@@ -145,6 +203,7 @@ app.get('/api/entries',(req,res) =>{
 
 app.post('/api/entries',(req,res) =>{
   var e = req.body;
+  var query_requestInsertPlayer = ""
   console.log(e,type(e));
   
   if (entries.some(item=>item.name == e.name)){
@@ -152,10 +211,27 @@ app.post('/api/entries',(req,res) =>{
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
     entries[idx] = {name:e.name,team:e.team,score:0}
+    res.send(entries)
+    // query_requestInsertPlayer = 'UPDATE TABLE ma'
   }else {
      entries.push({name:e.name,team:e.team,score:0}); 
+  
+
+      requestInsertPlayer = new Request(
+      'INSERT INTO iplTest values(\''+e.name +'\',0)',
+      function(err, rowCount, rows) {
+           if (err) {
+                  console.log("Error");
+                  res.sendStatus(400)
+           } else {
+                  console.log("Query executed");
+                  res.send(entries)
+        // res.send({result : "Query Executed"})
+           }
+      });
+      connection.execSql(requestInsertPlayer);
   }
-  res.send(entries)
+  
   
   // res.send(entries);
 })
@@ -164,3 +240,6 @@ const port = normalizePort(process.env.PORT || 3000);
 app.listen(port, () => {
   console.log(`API listening on port: ${port}`);
 });
+
+
+

@@ -87,6 +87,22 @@ class MainTable extends React.Component {
           }
         })
       } )
+
+      const apiUrlPlayer = '/api/players';
+      fetch(apiUrlPlayer)
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('This is your data', data);
+          this.setState((state)=>{
+            return{
+              ...this.state.ent,
+              ...this.state.nameInput,
+              ...this.state.teamInput,
+              team1 : data.team1,
+              team2 : data.team2 
+            }
+          })
+        } )
   }
 
 
@@ -106,7 +122,8 @@ class MainTable extends React.Component {
   formSubmit = (name,team) =>{
     console.log("Before",this.state);
     //  const entries = this.state.ent;
-    
+    var date = new Date();
+    if (date.getHours()<19 && date.getMinutes()<15){
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -143,6 +160,9 @@ class MainTable extends React.Component {
     
 
      console.log("After",this.state)
+      }else{
+        alert("Submission Time is over");
+      }
   }
 
   render(){
