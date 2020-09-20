@@ -72,8 +72,8 @@ class MainTable extends React.Component {
         })
       } )
 
-    apiUrl = '/api/matches';
-    fetch(apiUrl)
+    const apiUrlMatch = '/api/matches';
+    fetch(apiUrlMatch)
       .then((response) => response.json())
       .then((data) => {
         console.log('This is your data', data);
