@@ -58,7 +58,7 @@ connection.on('connect', function(err) {
 });
 
 app.get('/api/players',(req,res)=>{
-  var e = req.body;
+
   var result = "";
   var queryPlayer = 'SELECT player FROM dbo.iplTest ;';
   console.log(queryPlayer);
@@ -79,7 +79,7 @@ app.get('/api/players',(req,res)=>{
             console.log("Duplicate");
             const idx = entries.findIndex(item => item.name == player)
             console.log("Duplicate id ",idx);
-            entries[idx] = {name:player,team: e.team.team,score:0}
+            entries[idx] = {name:player,team: entries[idx].team,score:0}
           }else {
              entries.push({name:player,team:"",score:0}); 
           }
