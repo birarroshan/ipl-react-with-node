@@ -109,43 +109,50 @@ app.get('/api/players',(req,res)=>{
 })
 
 var matchID = parseInt(process.env.match_id)
+var matchTeam1 = ""
+var matchTeam2 = ""
 app.get('/api/matches',(req,res)=>{
-  var result = "";
-  d = new Date(Date.now())
+  if (matchTeam1 == "" ){
+    var result = "";
+    d = new Date(Date.now())
+      
+    var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
+    console.log(query);
+    requestGetM = new Request(
+      query,
+      function(err, rowCount, rows) {
+      if (err) {
+          console.log(err)
+          res.sendStatus(400)
+      } else {
+          console.log(rowCount + ' row(s) returned');
+          teams = result.split(" ");
+          // matchID = teams[0];
+           matchTeam1 = teams[1]
+           matchTeam2 = teams[2]
+          res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
+      }
+      });
+      
+      requestGetM.on('row', function(columns) {
+          columns.forEach(function(column) {
+              if (column.value === null) {
+                  console.log('NULL');
+              } else {
+                  result += column.value + " ";
+              }
+          });
+          console.log(result);
+          // result = "";
+      });
   
-  var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
-  console.log(query);
-  requestGet = new Request(
-    query,
-    function(err, rowCount, rows) {
-    if (err) {
-        console.log(err)
-        res.sendStatus(400)
-    } else {
-        console.log(rowCount + ' row(s) returned');
-        teams = result.split(" ");
-        // matchID = teams[0];
-
-        res.send({team1 : teams[1],team2 : teams[2]});
-    }
-    });
-    
-    requestGet.on('row', function(columns) {
-        columns.forEach(function(column) {
-            if (column.value === null) {
-                console.log('NULL');
-            } else {
-                result += column.value + " ";
-            }
-        });
-        console.log(result);
-        // result = "";
-    });
-
-    // Execute SQL statement
-   
-      connection.execSql(requestGet);
-   
+      // Execute SQL statement
+     
+        connection.execSql(requestGetM);
+ 
+  }else{
+    res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
+  }
     
 })
 
@@ -198,8 +205,45 @@ app.get('/api/submit/:winner',(req,res)=>{
 })
 
 app.get('/api/matchid/:match_id',(req,res)=>{
-     matchID = res.params.match_id
-     res.send({"matchID" : matchID})
+     matchID = req.params.match_id
+     var result = "";
+     d = new Date(Date.now())
+       
+     var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
+     console.log(query);
+     requestGet = new Request(
+       query,
+       function(err, rowCount, rows) {
+       if (err) {
+           console.log(err)
+           res.sendStatus(400)
+       } else {
+           console.log(rowCount + ' row(s) returned');
+           teams = result.split(" ");
+           // matchID = teams[0];
+            matchTeam1 = teams[1]
+            matchTeam2 = teams[2]
+           res.send({ matchID : matchID,team1 : teams[1],team2 : teams[2]});
+       }
+       });
+       
+       requestGet.on('row', function(columns) {
+           columns.forEach(function(column) {
+               if (column.value === null) {
+                   console.log('NULL');
+               } else {
+                   result += column.value + " ";
+               }
+           });
+           console.log(result);
+           // result = "";
+       });
+   
+       // Execute SQL statement
+      
+         connection.execSql(requestGet);
+      
+    //  res.send({"matchID" : matchID})
 })
 
 app.get('/api/entries',(req,res) =>{
@@ -216,7 +260,7 @@ app.post('/api/entries',(req,res) =>{
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
     entries[idx] = {name:e.name,team:e.team,score:0}
-    query_requestInsertPlayer = 'UPDATE TABLE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
+    query_requestInsertPlayer = 'UPDATE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
     // res.send(entries)
     
   }else {
@@ -228,7 +272,7 @@ app.post('/api/entries',(req,res) =>{
       query_requestInsertPlayer,
       function(err, rowCount, rows) {
            if (err) {
-                  console.log("Error");
+                  console.log(err);
                   res.sendStatus(400)
            } else {
                   console.log("Query executed");
