@@ -28,18 +28,20 @@ class MainTable extends React.Component {
                   nameInput : "",
                   teamInput : "",
                   team1 : "",
-                  team2 : ""
+                  team2 : "",
+                  showVotes : false
               }
 
   }
 
-  showVotes = false
+  
   handleNameChange = (e)  => {
     this.setState({
       ...this.state.ent,
       ...this.state.teamInput,
       ...this.state.team1,
       ...this.state.team2,
+      ...this.showVotes,
       nameInput : e.target.value
     })
     console.log(this.state.nameInput)
@@ -50,6 +52,7 @@ class MainTable extends React.Component {
       ...this.state.nameInput,
       ...this.state.team1,
       ...this.state.team2,
+      ...this.showVotes,
       teamInput : e.target.value
     })
     console.log(this.state.teamInput)
@@ -68,6 +71,7 @@ class MainTable extends React.Component {
               ...this.state.ent,
               ...this.state.nameInput,
               ...this.state.teamInput,
+              ...this.showVotes,
               team1 : data.team1,
               team2 : data.team2 
             }
@@ -75,7 +79,16 @@ class MainTable extends React.Component {
     
           // First request done - 
             if ( new Date().getHours()>19 ){
-              this.showVotes = true;
+              this.setState((state)=>{
+                return{
+                  ...this.state.ent,
+                  ...this.state.nameInput,
+                  ...this.state.teamInput,
+                  ...this.state.team1,
+                  ...this.state.team2,
+                  showVotes : true 
+                }
+              })
             }
            
             return fetch(apiUrl)
@@ -114,12 +127,13 @@ class MainTable extends React.Component {
 
 
   TableRow(props) {  
-    // console.log("Tbale row",props)
-    const entries = props.entries;
+     console.log("Tbale row",props)
+    const entries = props.entries.ent;
+
     const vote = "Voted"
     console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
-       <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( this.showVotes ? entry.team :"Voted")} </td><td>0</td> </tr>
+       <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>0</td> </tr>
      )
     
     return (
@@ -186,7 +200,7 @@ class MainTable extends React.Component {
           <thead >
           <tr><th >Name</th><th >Team</th><th>Score</th></tr>
           </thead>
-          <this.TableRow entries={this.state.ent}></this.TableRow>
+          <this.TableRow entries={this.state}></this.TableRow>
           
         </table>
       </div>
