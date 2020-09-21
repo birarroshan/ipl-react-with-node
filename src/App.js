@@ -78,7 +78,7 @@ class MainTable extends React.Component {
           })
     
           // First request done - 
-            if ( new Date().getHours()>19 ){
+            if ( new Date().getHours()>=19 ){
               this.setState((state)=>{
                 return{
                   ...this.state.ent,
@@ -99,6 +99,7 @@ class MainTable extends React.Component {
                   return{
                        ...this.state.team1,
                        ...this.state.team2,
+                       ...this.showVotes,
                        ent : data,
                        nameInput : '',
                        teamInput : ''
@@ -116,6 +117,7 @@ class MainTable extends React.Component {
                          ...this.state.ent,
                          ...this.state.nameInput,
                          ...this.state.teamInput,
+                         ...this.showVotes,
                          team1 : data.team1,
                          team2 : data.team2 
                        }

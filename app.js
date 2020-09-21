@@ -59,8 +59,9 @@ connection.on('connect', function(err) {
 
 app.get('/api/players',(req,res)=>{
 
+if(entries.length == 0){
   var result = "";
-  var queryPlayer = 'SELECT player FROM dbo.iplTest ;';
+  var queryPlayer = 'SELECT player,vote FROM dbo.iplTest;';
   console.log(queryPlayer);
   requestGetPlayer = new Request(
     queryPlayer,
@@ -73,20 +74,37 @@ app.get('/api/players',(req,res)=>{
     else {
         console.log(rowCount + ' row(s) returned');
         players = result.split(" ");
-        players.forEach((player)=>{
-          if(player!=""){
-          if (entries.some(item=>item.name == player)){
-            console.log("Duplicate");
-            const idx = entries.findIndex(item => item.name == player)
-            console.log("Duplicate id ",idx);
-            entries[idx] = {name:player,team: entries[idx].team,score:0}
-          }else {
-             entries.push({name:player,team:"",score:0}); 
+        // players.forEach((player,i,arr)=>{
+        //   if(player!=""){
+        //   if (entries.some(item=>item.name == player)){
+        //     console.log("Duplicate");
+        //     const idx = entries.findIndex(item => item.name == player)
+        //     console.log("Duplicate id ",idx);
+        //     entries[idx] = {name:player,team: arr[i+1],score:0}
+        //   }else {
+        //      entries.push({name:player,team:arr[i+1],score:0}); 
+        //   }
+        // }i++;
+        // })
+        entries = []
+        for(let i = 0; i < players.length; i++){ 
+          
+          player = players[i]
+          if(player !=""){
+          console.log("Player and team",player,players[i+1],i)
+          // if (entries.some(item=>item.name == player)){
+          //   console.log("Duplicate");
+          //   const idx = entries.findIndex(item => item.name == player)
+          //   console.log("Duplicate id ",idx);
+          //   entries[idx] = {name:player,team: players[i+1],score:0}
+          // }else {
+             entries.push({name:player,team:players[i+1],score:0}); 
+          // }
+          i++;
           }
         }
-        })
         // resolve();
-
+      
         res.send(entries);
      }
     }
@@ -105,7 +123,8 @@ app.get('/api/players',(req,res)=>{
     });
     
     connection.execSql(requestGetPlayer);
-
+  }
+  else res.send(entries)
 })
 
 var matchID = parseInt(process.env.match_id)
@@ -268,6 +287,7 @@ app.post('/api/entries',(req,res) =>{
      query_requestInsertPlayer = 'INSERT INTO iplTest values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
 
   }
+  console.log(query_requestInsertPlayer)
       requestInsertPlayer = new Request(
       query_requestInsertPlayer,
       function(err, rowCount, rows) {
