@@ -33,6 +33,7 @@ class MainTable extends React.Component {
 
   }
 
+  showVotes = false
   handleNameChange = (e)  => {
     this.setState({
       ...this.state.ent,
@@ -73,6 +74,9 @@ class MainTable extends React.Component {
           })
     
           // First request done - 
+            if ( new Date().getHours()>19 ){
+              this.showVotes = true;
+            }
            
             return fetch(apiUrl)
            .then((response) => response.json())
@@ -88,7 +92,7 @@ class MainTable extends React.Component {
                    }
                    })
 
-
+                   setTimeout(function(){  }, 1000);
                    // Second Call done 
                    return   fetch(apiUrlMatch)
                    .then((response) => response.json())
@@ -115,7 +119,7 @@ class MainTable extends React.Component {
     const vote = "Voted"
     console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
-       <tr key={i}><td>{entry.name}</td><td>{ entry.team === "" ? "" : "Voted"} </td><td>0</td> </tr>
+       <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( this.showVotes ? entry.team :"Voted")} </td><td>0</td> </tr>
      )
     
     return (
@@ -124,14 +128,16 @@ class MainTable extends React.Component {
   } 
 
   formSubmit = (name,team) =>{
+    name = name.trim()
+    team = team.trim()
     console.log("Before",this.state);
     //  const entries = this.state.ent;
     var date = new Date();
-    if (date.getHours()<20 ){
+    if (date.getHours()<19 ){
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, team : team })
+      body: JSON.stringify({ name : name, team : team })
   };
   fetch('/api/entries', requestOptions)
       .then(response => response.json())

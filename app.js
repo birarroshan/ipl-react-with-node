@@ -176,7 +176,7 @@ app.get('/api/submit/:winner',(req,res)=>{
      }
         
       })
-      tscore =   tscore/(entries.length-winners);
+      tscore =   tscore/winners;
       q2 = q2.replace(/replace_this/g, tscore.toString())
 
         console.log("INsert q ",q2)
@@ -189,12 +189,17 @@ app.get('/api/submit/:winner',(req,res)=>{
           } else {
               console.log("Query executed");
               matchID = matchID+1
+              entries = []
               res.send({result : "Query Executed", score:tscore,query:q2})
           }
           });
          connection.execSql(requestInsert);
-    
   
+})
+
+app.get('/api/matchid/:match_id',(req,res)=>{
+     matchID = res.params.match_id
+     res.send({"matchID" : matchID})
 })
 
 app.get('/api/entries',(req,res) =>{
@@ -211,14 +216,16 @@ app.post('/api/entries',(req,res) =>{
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
     entries[idx] = {name:e.name,team:e.team,score:0}
-    res.send(entries)
-    // query_requestInsertPlayer = 'UPDATE TABLE ma'
+    query_requestInsertPlayer = 'UPDATE TABLE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
+    // res.send(entries)
+    
   }else {
      entries.push({name:e.name,team:e.team,score:0}); 
-  
+     query_requestInsertPlayer = 'INSERT INTO iplTest values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
 
+  }
       requestInsertPlayer = new Request(
-      'INSERT INTO iplTest values(\''+e.name +'\',0)',
+      query_requestInsertPlayer,
       function(err, rowCount, rows) {
            if (err) {
                   console.log("Error");
@@ -230,7 +237,7 @@ app.post('/api/entries',(req,res) =>{
            }
       });
       connection.execSql(requestInsertPlayer);
-  }
+  
   
   
   // res.send(entries);
