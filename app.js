@@ -196,22 +196,22 @@ app.get('/api/submit/:winner',(req,res)=>{
      if (item.team == win) {
       item.score = 10;
       winners = winners+1;
-      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'replace_this\');'
+      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'replace_this\',\''+ item.team +'\');'
      }  else {
-      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'0\');'
+      q2 = q2 + 'INSERT INTO dbo.matchscore  VALUES (\''+matchID+'\', \''+item.name+'\',\'0\',\''+ item.team +'\');'
      }
         
       })
       tscore =   tscore/winners;
       q2 = q2.replace(/replace_this/g, tscore.toString())
-
+      q2 = q2 + 'Update iplTest set vote = \'\' where matchID = \''+matchID+'\';'
         console.log("INsert q ",q2)
         requestInsert = new Request(
           q2,
           function(err, rowCount, rows) {
           if (err) {
               console.log("Error");
-              res.sendStatus(400)
+              res.status(400).send({result : "Query Failed", score:tscore,query:q2})
           } else {
               console.log("Query executed");
               matchID = matchID+1
