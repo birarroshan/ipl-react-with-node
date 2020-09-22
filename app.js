@@ -278,7 +278,7 @@ app.post('/api/entries',(req,res) =>{
     console.log("Duplicate");
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
-    entries[idx] = {name:e.name,team:e.team,score:e.score}
+    entries[idx] = {name:e.name,team:e.team,score:entries[idx].score}
     query_requestInsertPlayer = 'UPDATE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
     // res.send(entries)
     
