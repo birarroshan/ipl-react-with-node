@@ -44,7 +44,7 @@ class MainTable extends React.Component {
       ...this.showVotes,
       nameInput : e.target.value
     })
-    console.log(this.state.nameInput)
+    // console.log(this.state.nameInput)
   }
   handleTeamChange = (e)  => {
     this.setState({
@@ -55,7 +55,7 @@ class MainTable extends React.Component {
       ...this.showVotes,
       teamInput : e.target.value
     })
-    console.log(this.state.teamInput)
+    // console.log(this.state.teamInput)
   }
   
   componentDidMount(){

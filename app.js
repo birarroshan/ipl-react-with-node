@@ -278,12 +278,12 @@ app.post('/api/entries',(req,res) =>{
     console.log("Duplicate");
     const idx = entries.findIndex(item => item.name == e.name)
     console.log("Duplicate id ",idx);
-    entries[idx] = {name:e.name,team:e.team,score:0}
+    entries[idx] = {name:e.name,team:e.team,score:e.score}
     query_requestInsertPlayer = 'UPDATE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
     // res.send(entries)
     
   }else {
-     entries.push({name:e.name,team:e.team,score:0}); 
+     entries.push({name:e.name,team:e.team,score:e.score}); 
      query_requestInsertPlayer = 'INSERT INTO iplTest values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
 
   }
