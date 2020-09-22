@@ -61,7 +61,7 @@ app.get('/api/players',(req,res)=>{
 
 if(entries.length == 0){
   var result = "";
-  var queryPlayer = 'SELECT player,vote FROM dbo.iplTest;';
+  var queryPlayer = 'SELECT player,vote,score FROM dbo.iplTest;';
   console.log(queryPlayer);
   requestGetPlayer = new Request(
     queryPlayer,
@@ -98,9 +98,9 @@ if(entries.length == 0){
           //   console.log("Duplicate id ",idx);
           //   entries[idx] = {name:player,team: players[i+1],score:0}
           // }else {
-             entries.push({name:player,team:players[i+1],score:0}); 
+             entries.push({name:player,team:players[i+1],score:players[i+2]}); 
           // }
-          i++;
+          i=i+2;
           }
         }
         // resolve();
