@@ -135,7 +135,7 @@ class MainTable extends React.Component {
     const vote = "Voted"
     console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
-       <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>0</td> </tr>
+       <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>{entry.score}</td> </tr>
      )
     
     return (
