@@ -279,6 +279,9 @@ app.get('/api/entries',(req,res) =>{
 
 app.post('/api/entries',(req,res) =>{
   var e = req.body;
+  up_name = e.name.toString()
+  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
+  e.name = up_name;
   var query_requestInsertPlayer = ""
   console.log(e,type(e));
   
@@ -291,6 +294,9 @@ app.post('/api/entries',(req,res) =>{
     // res.send(entries)
     
   }else {
+     
+    //  up_name = e.name.toString()
+    //  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
      entries.push({name:e.name,team:e.team,score:e.score}); 
      query_requestInsertPlayer = 'INSERT INTO iplTest values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
 
