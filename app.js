@@ -61,7 +61,7 @@ app.get('/api/players',(req,res)=>{
 
 if(entries.length == 0){
   var result = "";
-  var queryPlayer = 'SELECT player,vote,score FROM dbo.iplTest;';
+  var queryPlayer = 'SELECT player,vote,score FROM dbo.iplTest order by score desc;';
   console.log(queryPlayer);
   requestGetPlayer = new Request(
     queryPlayer,

@@ -6,6 +6,7 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
   
   <div className={styles.EntryForm}>
     <h3>{team1} vs {team2}</h3>
+    <h6>Winner Points = 10 x (No. of players) / No. of Winners </h6>
     <p>Enter your prediction</p>
     
     <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange}></input>
@@ -14,7 +15,7 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
         <option value={team1}>{team1}</option>
         <option value={team2}>{team2}</option>
     </select>
-    <div><button type="submit" disabled={ teamInput==='--select--' || teamInput==='' || nameInput===''  } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
+    <div><button  type="submit" disabled={ teamInput==='--select--' || teamInput==='' || nameInput===''  } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
     
   </div>
 
