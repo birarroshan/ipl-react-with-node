@@ -186,6 +186,13 @@ app.get('/', (req, res) => {
 
 app.get('/api/submit/:winner',(req,res)=>{
   // var query = 'INSER into matchscore values('+matchID+','','')'
+  var scoreTotalProc = 'with sc as ( '+
+    'select m.player as play,round(sum(m.score),2) as total from matchscore m ' +
+    'inner join iplTest  p on p.player = m.player ' +
+    'group by m.player)'+
+    'MERGE iplTest t USING sc s '+
+    'on t.player = s.play '+
+    'WHEN MATCHED THEN Update set t.score = s.total;'
   var win = req.params.winner
   var q2  = ""
   var tscore = 10*entries.length
@@ -205,6 +212,7 @@ app.get('/api/submit/:winner',(req,res)=>{
       tscore =   tscore/winners;
       q2 = q2.replace(/replace_this/g, tscore.toString())
       q2 = q2 + 'Update iplTest set vote = \'\' where matchID = \''+matchID+'\';'
+      q2 = q2 + scoreTotalProc;
         console.log("INsert q ",q2)
         requestInsert = new Request(
           q2,

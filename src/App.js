@@ -65,7 +65,7 @@ class MainTable extends React.Component {
       fetch(apiUrlPlayer)
         .then((response) => response.json())
         .then((data) => {
-          console.log('This is player data', data);
+          // console.log('This is player data', data);
           this.setState((state)=>{
             return{
               ...this.state.ent,
@@ -94,7 +94,7 @@ class MainTable extends React.Component {
             return fetch(apiUrl)
            .then((response) => response.json())
              .then((data) => {
-             console.log('This is entries data', data);
+            //  console.log('This is entries data', data);
                 this.setState((state)=>{
                   return{
                        ...this.state.team1,
@@ -111,7 +111,7 @@ class MainTable extends React.Component {
                    return   fetch(apiUrlMatch)
                    .then((response) => response.json())
                    .then((data) => {
-                     console.log('This is Match Data', data);
+                      // console.log('This is Match Data', data);
                      this.setState((state)=>{
                        return{
                          ...this.state.ent,
@@ -129,11 +129,11 @@ class MainTable extends React.Component {
 
 
   TableRow(props) {  
-     console.log("Tbale row",props)
+    //  console.log("Tbale row",props)
     const entries = props.entries.ent;
 
     const vote = "Voted"
-    console.log("Entries",entries)
+    // console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
        <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>{entry.score}</td> </tr>
      )
@@ -185,7 +185,7 @@ class MainTable extends React.Component {
 
     
 
-     console.log("After",this.state)
+    //  console.log("After",this.state)
       }else{
         alert("Submission Time is over");
       }
