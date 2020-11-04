@@ -195,7 +195,7 @@ app.get('/api/submit/:winner',(req,res)=>{
     'WHEN MATCHED THEN Update set t.score = s.total;'
   var win = req.params.winner
   var q2  = ""
-  var tscore = 10*entries.length
+  var tscore = 20*entries.length
   winners = 0;
   entries.forEach((item)=>{
    
