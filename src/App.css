@@ -37,6 +37,19 @@
   color: #61dafb;
 }
 
+.App-model {
+  color: black;
+  text-align: justify;
+  font-size: 15px;
+  text-indent: 5%;
+  position: absolute;
+  z-index: 3; /* gray box will be above both green and black box */
+  background: lightgray;
+  height: 50%;  
+  width: 50%;
+  left: 25%;
+  top: 25%;
+}
 
 .ReactTable {
   table-layout: auto;
@@ -77,4 +90,11 @@ th {
 th {
   background-color: white;
   color: black;
+}
+
+button {
+  background-color: #282c34;
+  color: white;
+  border-top: white;
+  border-style: ridge;
 }
