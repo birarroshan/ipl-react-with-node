@@ -52,5 +52,5 @@ jobs:
         with:
           app-name: 'ipl-nuance'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_FBBBCBB46BC14A719F1C4F982C1D6EA5 }}
+          publish-profile: ${{ secrets.MYDEPLOYMENTACTION }}
           package: .
