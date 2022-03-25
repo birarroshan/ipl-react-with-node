@@ -298,7 +298,7 @@ app.post('/api/entries',(req,res) =>{
     //  up_name = e.name.toString()
     //  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
      entries.push({name:e.name,team:e.team,score:e.score}); 
-     query_requestInsertPlayer = 'INSERT INTO iplTest values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
+     query_requestInsertPlayer = 'INSERT INTO iplTest(player,score,vote,matchID) values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
 
   }
   console.log(query_requestInsertPlayer)
