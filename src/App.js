@@ -14,11 +14,12 @@ function App() {
 
           <p>1. Click Help button to Hide Help </p>
           <p>2. You can see Teams competing at the top. Submit button will be enabled once you enter Name and select team</p>
-          <p>3. Voting line closes at <b>7 pm</b>. Relax,your votes will be hidden till 7</p>
-          <p>4. Points are calulated on the basis of Number of participants. Winner Points = 10 x (No. of players) / No. of Winners</p>
-          <p>5. Use same <b>Name</b> everyday for voting, otherwise your old score won't addup. Name is case insensetive.</p>
+          <p>3. If content on the page does not load, please refresh. (Glitch in the Matrix)</p>
+          <p>4. Voting line closes at <b>7 pm</b>. Relax,your votes will be hidden till 7</p>
+          <p>5. Points are calulated on the basis of Number of participants. Winner Points = 10 x (No. of players) / No. of Winners</p>
+          <p>6. Use same <b>Name</b> everyday for voting, otherwise your old score won't addup. Name is case insensetive.</p>
           <p>   So, "Roshan","roshan", "ROSHAN","roShan" is valid. "Ro shan" is not valid. </p>
-          <p>6. Scores will be calculated at the end of the match. Score field in table shows your total score across the tournament</p>
+          <p>7. Scores will be calculated at the end of the match. Score field in table shows your total score across the tournament</p>
           <p>NOTE - This tool may have bugs, don't exploit those &#128519;. Let me know, if you find any</p>
           <p>PS - Contant your manager for the prizes</p>
 
