@@ -16,7 +16,7 @@ const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamC
         <option value={team2}>{team2}</option>
     </select>
     <div><p></p><button  type="submit" disabled={ teamInput==='--select--' || teamInput==='' || nameInput===''  } onClick={(e)=>{formSubmit(nameInput,teamInput)}}>Submit</button></div>
-    <iframe src="https://widget.crictimes.org/"  frameborder="1" style={{'width':'40%','height':'200px'}} scrolling="no"></iframe>
+    
   </div>
 
 );
