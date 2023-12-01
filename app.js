@@ -34,16 +34,16 @@ var TYPES = require('tedious').TYPES;
 
 // Create connection to database
 var config = {
-  server:    process.env.server_name,//'uenha-dfsql0004.database.windows.net',
+  server:    'mycricket.database.windows.net', // process.env.server_name,//
   authentication: {
       type: 'default',
       options: {
-          userName:  process.env.user_name,//'capd_admin', // update me
-          password: process.env.password,//'Password!@' // update me
+          userName:  'cricket',//process.env.user_name,//'capd_admin', // update me
+          password: 'Cricket@123' //process.env.password,//'Password!@' // update me
       }
   },
   options: {
-      database: process.env.db_name
+      database: 'backenddb' //process.env.db_name
   }
 }
 var connection = new Connection(config);
@@ -126,6 +126,7 @@ if(entries.length == 0){
   }
   else res.send(entries)
 })
+// Dummy change
 
 var matchID = parseInt(process.env.match_id)
 var matchTeam1 = ""
@@ -233,6 +234,7 @@ app.get('/api/submit/:winner',(req,res)=>{
 
 app.get('/api/matchid/:match_id',(req,res)=>{
      matchID = req.params.match_id
+     console.log("Match ID ",matchID);
      var result = "";
      d = new Date(Date.now())
        
