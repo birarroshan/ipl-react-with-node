@@ -20,11 +20,11 @@ function App() {
           <p>6. Use same <b>Name</b> everyday for voting, otherwise your old score won't addup. Name is case insensetive.</p>
           <p>   So, "Roshan","roshan", "ROSHAN","roShan" is valid. "Ro shan" is not valid. </p>
           <p>7. Scores will be calculated at the end of the match. Score field in table shows your total score across the tournament</p>
-          <p>NOTE - This tool may have bugs, don't exploit those &#128519;. Let me know, if you find any</p>
+          <p>NOTE - This tool may have bugs, don't exploit those. Let me know, if you find any</p>
           <p>PS - Contant your manager for the prizes</p>
 
       </model>
-          <img src={logo}  /> 
+          <img alt='Logo' src={logo}  /> 
             <button onClick={showHelp}>Help</button>
           <div id="form1">
           </div>
@@ -37,11 +37,11 @@ function App() {
 }
 
 function showHelp()  {
-  if(helpM == "block"){
+  if(helpM === "block"){
     helpM = "none"
     document.getElementById("help").style.display = helpM
   }
-  else if(helpM == "none"){
+  else if(helpM === "none"){
     helpM = "block"
     document.getElementById("help").style.display = helpM
   }
@@ -158,7 +158,7 @@ class MainTable extends React.Component {
     //  console.log("Tbale row",props)
     const entries = props.entries.ent;
 
-    const vote = "Voted"
+    //const vote = "Voted"
     // console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
        <tr key={i}><td>{entry.name}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>{entry.score}</td> </tr>
