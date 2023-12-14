@@ -31,28 +31,57 @@ app.use('/public', express.static('public'));
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
 var TYPES = require('tedious').TYPES;
+const sql = require('mssql')
 
 // Create connection to database
 var config = {
-  server:    'mycricket.database.windows.net', // process.env.server_name,//
+  server:    'iplserver.database.windows.net', // process.env.server_name,//
   authentication: {
       type: 'default',
       options: {
-          userName:  'cricket',//process.env.user_name,//'capd_admin', // update me
-          password: 'Cricket@123' //process.env.password,//'Password!@' // update me
+          userName:  'myadmin',//process.env.user_name,//'capd_admin', // update me
+          password: 'A@12345678' //process.env.password,//'Password!@' // update me
       }
   },
   options: {
-      database: 'backenddb' //process.env.db_name
+      database: 'backenddb_Copy' //process.env.db_name
 
   }
 }
+
+// const configms = {
+//   user: 'myadmin',
+//   password: 'A@12345678',
+//   server: 'iplserver.database.windows.net', // You can use 'localhost\\instance' to connect to named instance
+//   database: 'backenddb_Copy',
+// }
+
+
+// sql.on('error', err => {
+//   // ... error handler
+//   console.log("This is error",err)
+// })
+
+// sql.connect(configms).then(pool => {
+//   // Query
+//   return pool.request()
+//       //.input('input_parameter', sql.Int, 1)
+//       .query('SELECT player,vote,score FROM dbo.iplTest order by score desc;')
+// }).then(result => {
+//   console.dir(result)
+// }).catch(err => {
+// // ... error checks
+// });
+
 var connection = new Connection(config);
-connection.connect(()=>{
-   console.log("Checking")
+connection.connect(function(err){
+  if(err){
+    console.log(err)
+  } 
+  console.log("Checking")
 })
 
-// Attempt to connect and execute queries if connection goes through
+//Attempt to connect and execute queries if connection goes through
 connection.on('connect', function(err) {
   if (err) {
     console.log("Error while connecting to DB",err);
@@ -133,7 +162,7 @@ if(entries.length == 0){
 })
 // Dummy change
 
-var matchID = parseInt(process.env.match_id)
+var matchID = parseInt("1")
 var matchTeam1 = ""
 var matchTeam2 = ""
 app.get('/api/matches',(req,res)=>{
@@ -143,6 +172,18 @@ app.get('/api/matches',(req,res)=>{
       
     var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
     console.log(query);
+    // sql.connect(configms).then(pool => {
+    //   // Query
+    //   return sql.query(query)
+    // }).then(result => {
+    //   console.log(result)
+    //   console.log("Match ID fetched",result.recordset[0].matchID)
+    //   matchTeam1 = result.recordset[0].team1
+    //   matchTeam2 = result.recordset[0].team2
+    //   res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
+    // }).catch(err => {
+    //  console.log("Error occuerred", err)
+    // });
     requestGetM = new Request(
       query,
       function(err, rowCount, rows) {
@@ -277,7 +318,7 @@ app.get('/api/matchid/:match_id',(req,res)=>{
       
          connection.execSql(requestGet);
       
-    //  res.send({"matchID" : matchID})
+      //  res.send({"matchID" : matchID})
 })
 
 app.get('/api/entries',(req,res) =>{
