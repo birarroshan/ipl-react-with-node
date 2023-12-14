@@ -44,16 +44,21 @@ var config = {
   },
   options: {
       database: 'backenddb' //process.env.db_name
+
   }
 }
 var connection = new Connection(config);
+connection.connect(()=>{
+   console.log("Checking")
+})
 
 // Attempt to connect and execute queries if connection goes through
 connection.on('connect', function(err) {
   if (err) {
-    console.log(err);
+    console.log("Error while connecting to DB",err);
   } else {
-    console.log('Connected');
+    console.log("Successful connection");
+
   }
 });
 
