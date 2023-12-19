@@ -1,15 +1,28 @@
 import React from 'react';
-import logo from './ipl2020.jfif';
+//import logo from './ipl2020.jfif';
+import gif1 from './gifs/ipl1.gif';
+import gif2 from './gifs/ipl2.gif';
+import gif3 from './gifs/ipl3.gif';
+import gif4 from './gifs/ipl5.gif';
+import gif5 from './gifs/ipl6.gif';
+import gif6 from './gifs/ipl7.gif';
+import gif7 from './gifs/ipl4.gif';
+
 import './App.css';
 import EntryForm from './components/EntryForm';
 
 var helpM = "none"
+const gifs = [gif1, gif2, gif3, gif4, gif5, gif6, gif7];
+const getRandomIndex = () => {
+  console.log("Calling random func")
+  return Math.floor(Math.random() * gifs.length);
+};
 
 function App() {
   return (
     <div className="App">
       <div id="test" className="App-body">
-      <model id='help' className="App-model" style={{display: "none" }}>
+      <div id='help' className="App-model" style={{display: "none" }}>
           
 
           <p>1. Click Help button to Hide Help </p>
@@ -23,8 +36,8 @@ function App() {
           <p>NOTE - This tool may have bugs, don't exploit those. Let me know, if you find any</p>
           <p>PS - Contant your manager for the prizes</p>
 
-      </model>
-          <img alt='Logo' src={logo}  /> 
+      </div>
+          <img alt='Logo' src={gifs[getRandomIndex()]} height={250} width={250}   /> 
             <button onClick={showHelp}>Help</button>
           <div id="form1">
           </div>
@@ -180,7 +193,7 @@ class MainTable extends React.Component {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name : name, team : team })
-  };
+    };
   fetch('/api/entries', requestOptions)
       .then(response => response.json())
       .then(data => 
@@ -216,7 +229,7 @@ class MainTable extends React.Component {
         alert("Submission Time is over");
       }
   }
-
+  
   render(){
     return (
       <div>

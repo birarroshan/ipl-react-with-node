@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -30,8 +31,6 @@ app.use('/public', express.static('public'));
 
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request;
-var TYPES = require('tedious').TYPES;
-const sql = require('mssql')
 
 // Create connection to database
 var config = {
@@ -326,47 +325,56 @@ app.get('/api/entries',(req,res) =>{
 })
 
 app.post('/api/entries',(req,res) =>{
-  var e = req.body;
-  up_name = e.name.toString()
-  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
-  e.name = up_name;
-  var query_requestInsertPlayer = ""
-  console.log(e,type(e));
-  
-  if (entries.some(item=>item.name == e.name)){
-    console.log("Duplicate");
-    const idx = entries.findIndex(item => item.name == e.name)
-    console.log("Duplicate id ",idx);
-    entries[idx] = {name:e.name,team:e.team,score:entries[idx].score}
-    query_requestInsertPlayer = 'UPDATE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
-    // res.send(entries)
-    
-  }else {
-     
-    //  up_name = e.name.toString()
-    //  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
-     entries.push({name:e.name,team:e.team,score:e.score}); 
-     query_requestInsertPlayer = 'INSERT INTO iplTest(player,score,vote,matchID) values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
+  let date= new Date();
+  let options = { timeZone: 'Asia/Kolkata' };
+  let currentHourIST = date.toLocaleString('en-US', { hour: 'numeric', hour12: false, ...options });
+  if (currentHourIST>=19 ){
+   // res.send(entries)
+   res.sendStatus(400);
+  }else{
 
-  }
-  console.log(query_requestInsertPlayer)
-      requestInsertPlayer = new Request(
-      query_requestInsertPlayer,
-      function(err, rowCount, rows) {
-           if (err) {
-                  console.log(err);
-                  res.sendStatus(400)
-           } else {
-                  console.log("Query executed");
-                  res.send(entries)
-        // res.send({result : "Query Executed"})
-           }
-      });
-      connection.execSql(requestInsertPlayer);
+      
+      var e = req.body;
+      var up_name = e.name.toString()
+      up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
+      e.name = up_name;
+      var query_requestInsertPlayer = ""
+      console.log(e,type(e));
+      
+      if (entries.some(item=>item.name == e.name)){
+        console.log("Duplicate");
+        const idx = entries.findIndex(item => item.name == e.name)
+        console.log("Duplicate id ",idx);
+        entries[idx] = {name:e.name,team:e.team,score:entries[idx].score}
+        query_requestInsertPlayer = 'UPDATE iplTest set vote =\''+e.team+'\',matchID = \''+matchID+'\' where player = \''+e.name+'\' ';
+        // res.send(entries)
+        
+      }else {
+        
+        //  up_name = e.name.toString()
+        //  up_name = up_name.charAt(0).toUpperCase() + up_name.slice(1).trim();
+        entries.push({name:e.name,team:e.team,score:e.score}); 
+        query_requestInsertPlayer = 'INSERT INTO iplTest(player,score,vote,matchID) values(\''+e.name +'\',0,\''+e.team+'\',\''+matchID+'\')';
+
+      }
+      console.log(query_requestInsertPlayer)
+          requestInsertPlayer = new Request(
+          query_requestInsertPlayer,
+          function(err, rowCount, rows) {
+              if (err) {
+                      console.log(err);
+                      res.sendStatus(400)
+              } else {
+                      console.log("Query executed");
+                      res.send(entries)
+            // res.send({result : "Query Executed"})
+              }
+          });
+          connection.execSql(requestInsertPlayer);
+      
+        }    
   
-  
-  
-  // res.send(entries);
+   //res.send(entries);
 })
 
 const port = normalizePort(process.env.PORT || 3000);
