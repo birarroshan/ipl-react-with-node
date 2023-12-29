@@ -1,5 +1,7 @@
 /* eslint-disable no-undef */
 const express = require('express');
+const passport = require('passport');
+const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -7,9 +9,7 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const { type } = require('os');
 const { json } = require('body-parser');
-const { ENETDOWN } = require('constants');
-const { request } = require('express');
-const { resolve } = require('path');
+
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -19,6 +19,10 @@ function normalizePort(val) {
 }
 
 const app = express();
+app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: false }));
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors({ credentials: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -48,30 +52,6 @@ var config = {
   }
 }
 
-// const configms = {
-//   user: 'myadmin',
-//   password: 'A@12345678',
-//   server: 'iplserver.database.windows.net', // You can use 'localhost\\instance' to connect to named instance
-//   database: 'backenddb_Copy',
-// }
-
-
-// sql.on('error', err => {
-//   // ... error handler
-//   console.log("This is error",err)
-// })
-
-// sql.connect(configms).then(pool => {
-//   // Query
-//   return pool.request()
-//       //.input('input_parameter', sql.Int, 1)
-//       .query('SELECT player,vote,score FROM dbo.iplTest order by score desc;')
-// }).then(result => {
-//   console.dir(result)
-// }).catch(err => {
-// // ... error checks
-// });
-
 var connection = new Connection(config);
 connection.connect(function(err){
   if(err){
@@ -89,6 +69,39 @@ connection.on('connect', function(err) {
 
   }
 });
+
+// Include your authentication configuration
+require('./auth');
+
+// Define authentication routes
+app.get('/login',
+  (req, res, next) => {
+    passport.authenticate('azuread-openidconnect', { failureRedirect: '/' })(req, res, next);
+    console.log("User infor",req.user);
+  },
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
+app.get('/',
+  (req, res, next) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect('/login');
+  },
+  (req, res) => {
+    // Access user information in req.user
+    //res.send(`Hello ${req.user.displayName}!`);
+    res.redirect('/home');
+  }
+);
 
 app.get('/api/players',(req,res)=>{
 
@@ -225,7 +238,7 @@ app.get('/api/matches',(req,res)=>{
 
 var  entries = []
 app.use(express.static(path.join(__dirname, 'build')));
-app.get('/', (req, res) => {
+app.get('/home', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
