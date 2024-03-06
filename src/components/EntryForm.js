@@ -1,15 +1,13 @@
 import React from 'react';
 import styles from './EntryForm.module.css';
 
-
 const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamChange,team1,team2}) => (
   
   <div className={styles.EntryForm}>
-    <h3>{team1} vs {team2}</h3>
-    <h6>Winner Points = 10 x (No. of players) / No. of Winners </h6>
-    <p>Enter your prediction</p>
     
-    <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange}></input>
+    <h6>Winner Points = 10 x (No. of players) / No. of Winners </h6>
+    
+    <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange} style={{display:'none'}}></input>
     <select name="Team" value={teamInput} onChange={handleTeamChange} >
         <option value ="select" >--Select--</option>
         <option value={team1}>{team1}</option>

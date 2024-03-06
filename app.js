@@ -1,7 +1,5 @@
 /* eslint-disable no-undef */
 const express = require('express');
-const passport = require('passport');
-const session = require('express-session');
 const path = require('path');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -19,10 +17,7 @@ function normalizePort(val) {
 }
 
 const app = express();
-app.use(session({ secret: 'your-secret-key', resave: true, saveUninitialized: false }));
-// Initialize Passport
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 app.use(cors({ credentials: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -31,6 +26,19 @@ app.use(helmet());
 app.use(logger('dev'));
 app.use('/public', express.static('public'));
 
+const {expressCspHeader,SELF} = require('express-csp-header');
+
+//const app = express();
+
+app.use(expressCspHeader({
+  directives: {
+    'default-src': [SELF],
+    'connect-src': [SELF, "https://login.microsoftonline.com"],
+    // Add other directives as needed
+  },
+}));
+
+// Other routes and middleware
 
 
 var Connection = require('tedious').Connection;
@@ -70,38 +78,15 @@ connection.on('connect', function(err) {
   }
 });
 
-// Include your authentication configuration
-require('./auth');
 
-// Define authentication routes
-app.get('/login',
-  (req, res, next) => {
-    passport.authenticate('azuread-openidconnect', { failureRedirect: '/' })(req, res, next);
-    console.log("User infor",req.user);
-  },
-  (req, res) => {
-    res.redirect('/');
-  }
-);
-
-app.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
-});
-
-app.get('/',
-  (req, res, next) => {
-    if (req.isAuthenticated()) {
-      return next();
-    }
-    res.redirect('/login');
-  },
-  (req, res) => {
-    // Access user information in req.user
-    //res.send(`Hello ${req.user.displayName}!`);
-    res.redirect('/home');
-  }
-);
+// app.get('/',
+//   (req, res, next) => {
+//     res.redirect('/home');
+//   },
+//   (req, res) => {
+//     res.redirect('/home');
+//   }
+// );
 
 app.get('/api/players',(req,res)=>{
 
@@ -119,7 +104,12 @@ if(entries.length == 0){
     } 
     else {
         console.log(rowCount + ' row(s) returned');
+        console.log("Check this result -----------");
+        console.log(result)
         players = result.split(" ");
+
+        console.log("Check this result splitteed aray -----------");
+        console.log(players)
         // players.forEach((player,i,arr)=>{
         //   if(player!=""){
         //   if (entries.some(item=>item.name == player)){
@@ -136,8 +126,9 @@ if(entries.length == 0){
         for(let i = 0; i < players.length; i++){ 
           
           player = players[i]
+          console.log("Iteration - ",i)
           if(player !=""){
-          console.log("Player and team",player,players[i+1],i)
+          console.log("Player and team",player,players[i+1])
           // if (entries.some(item=>item.name == player)){
           //   console.log("Duplicate");
           //   const idx = entries.findIndex(item => item.name == player)
@@ -238,7 +229,7 @@ app.get('/api/matches',(req,res)=>{
 
 var  entries = []
 app.use(express.static(path.join(__dirname, 'build')));
-app.get('/home', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
@@ -254,7 +245,10 @@ app.get('/api/submit/:winner',(req,res)=>{
     'WHEN MATCHED THEN Update set t.score = s.total;'
   var win = req.params.winner
   var q2  = ""
-  var tscore = 10*entries.length
+  console.log("Entries before winner",entries)
+  var newEnt = entries.filter(x=> x.team != "");
+  console.log("Filtereed ->",newEnt)
+  var tscore = 10*newEnt.length
   winners = 0;
   entries.forEach((item)=>{
    
