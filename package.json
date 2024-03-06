@@ -32,7 +32,7 @@
     "start": "react-scripts start",
     "serve": "node app.js",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --passWithNoTests",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
