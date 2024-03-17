@@ -4,8 +4,8 @@ import styles from './EntryForm.module.css';
 const EntryForm = ({formSubmit,nameInput, teamInput,handleNameChange,handleTeamChange,team1,team2}) => (
   
   <div className={styles.EntryForm}>
-    
-    <h6>Winner Points = 10 x (No. of players) / No. of Winners </h6>
+    <br/>
+    <h6>Winner Points = 10 x (No. of participants today) / No. of Winners </h6>
     
     <input placeholder="Name" value={nameInput} name="Name" onChange={handleNameChange} style={{display:'none'}}></input>
     <select name="Team" value={teamInput} onChange={handleTeamChange} >

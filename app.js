@@ -33,7 +33,7 @@ const {expressCspHeader,SELF} = require('express-csp-header');
 app.use(expressCspHeader({
   directives: {
     'default-src': [SELF],
-    'connect-src': [SELF, "https://login.microsoftonline.com"],
+    'connect-src': [SELF, "https://login.microsoftonline.com","https://myopenaieus.openai.azure.com/openai/deployments/mychatbot/chat/completions?api-version=2024-02-15-preview"],
     // Add other directives as needed
   },
 }));

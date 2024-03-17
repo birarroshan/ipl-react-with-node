@@ -4,10 +4,7 @@
  */
 
 import React from "react";
-import Navbar from "react-bootstrap/Navbar";
 import "./PageLayout.module.css"
-import { useIsAuthenticated } from "@azure/msal-react";
-//import { InteractionType } from "@azure/msal-react";
 import { useMsalAuthentication } from '@azure/msal-react';
 import { SignInButton } from "./SignInButton";
 import { SignOutButton } from "./SignOutButton";
@@ -23,9 +20,8 @@ export const PageLayout = (props) => {
     < >
     <div className="App">
       <div>
-        <button className="right-align">
-          {isAuthenticated ? <SignOutButton/> : <SignInButton />}
-        </button>
+        <br></br>
+        <h4>Welcome </h4>
       </div>
       </div>
       {props.children}

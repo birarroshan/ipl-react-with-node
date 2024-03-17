@@ -7,8 +7,8 @@ import gif4 from './gifs/ipl5.gif';
 import gif5 from './gifs/ipl6.gif';
 import gif6 from './gifs/ipl7.gif';
 import gif7 from './gifs/ipl4.gif';
+import gif8 from './gifs/ipl8.gif';
 
-import Login from './components/Login';
 import './App.css';
 import EntryForm from './components/EntryForm';
 
@@ -22,10 +22,16 @@ import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/
 
   //mport './App.css';
 
-import Button from 'react-bootstrap/Button';
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("api-key", "a3ed0daf3c77447eb260722990c87f08");
+  
+  var team1g = ""
+  var team2g = ""
+  
 
 var helpM = "none"
-const gifs = [gif1, gif2, gif3, gif4, gif5, gif6, gif7];
+const gifs = [gif1, gif2, gif3, gif4, gif5, gif6, gif7, gif8];
 const getRandomIndex = () => {
   console.log("Calling random func")
   //ProfileContent();
@@ -38,6 +44,53 @@ const UserIcon = () => (
   <path d="M19.9975 18C20 17.8358 20 17.669 20 17.5C20 15.0147 16.4183 13 12 13C7.58172 13 4 15.0147 4 17.5C4 19.9853 4 22 12 22C14.231 22 15.8398 21.8433 17 21.5634" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round"/>
   </svg>
 );
+
+
+function chatGpt() {
+  console.log("== Get completions Sample ==");
+  var raw = JSON.stringify({
+    "model": "mychatbot",
+    "messages": [
+      {
+        "role": "system",
+        "content": "You are a helpful assistant having information about. Consider team short form as follows- GT as Gujrat Titans, DC as Delhi Capital, LSG as Lucknow Super Giants."
+      },
+       {
+          "role" : "user",
+          "content" : " What is head to head record of GT vs DC ?"
+      },
+      {
+          "role": "assistant",
+          "content": "The head-to-head record between the teams Gujarat Lions (GT) and Delhi Capitals (DC) in the Indian Premier League (IPL) is as follows:\nTotal Matches Played: 6\nMatches won by Gujarat Lions: 2\nMatches won by Delhi Capitals: 4"
+      },
+      {
+          "role" : "user",
+          "content" : " " + team1g +" vs " + team2g+ " head to head result?"
+      }
+    ],
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "frequency_penalty": 0,
+    "presence_penalty": 0,
+    "max_tokens": 800,
+    "stop": null
+  });
+  
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+  
+ 
+  fetch("https://myopenaieus.openai.azure.com/openai/deployments/mychatbot/chat/completions?api-version=2024-02-15-preview", requestOptions)
+    .then((response) => response.json())
+    .then((result) => { document.getElementById("chatgptres").innerText =  result.choices[0].message.content; console.log("Result ", result) })
+    .catch((error) => console.error(error));
+  
+}
+
 
 var userName = "";
 
@@ -91,6 +144,7 @@ function App() {
         <button onClick={showHelp}>Help</button>
         <p id='user'></p>
         <MainTable />
+    
       </div> 
         </AuthenticatedTemplate>
         <UnauthenticatedTemplate>
@@ -206,6 +260,8 @@ class MainTable extends React.Component {
                    .then((response) => response.json())
                    .then((data) => {
                       // console.log('This is Match Data', data);
+                      team1g = data.team1
+                      team2g = data.team2
                      this.setState((state)=>{
                        return{
                          ...this.state.ent,
@@ -277,6 +333,9 @@ class MainTable extends React.Component {
     return (
       <div>
         <div><h3 class='blink'>{this.state.team1} vs {this.state.team2}</h3></div>
+        <br/>
+        <div id='chatgptres'></div> 
+        <button onClick={chatGpt}>GPT help?</button>
        <EntryForm formSubmit={this.formSubmit} nameInput={userName} teamInput={this.state.teamInput}  handleNameChange={this.handleNameChange} handleTeamChange={this.handleTeamChange} 
        team1={this.state.team1}   team2={this.state.team2}></EntryForm>
         <br />
