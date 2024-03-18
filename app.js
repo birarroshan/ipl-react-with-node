@@ -55,8 +55,8 @@ var config = {
       }
   },
   options: {
-      database: 'backenddb_Copy' //process.env.db_name
-
+      database: 'backenddb_Copy', //process.env.db_name
+      connectionTimeout: 0
   }
 }
 
