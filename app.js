@@ -78,6 +78,29 @@ connection.on('connect', function(err) {
   }
 });
 
+function reconnectDb() {
+  connection = new Connection(config);
+
+setTimeout(function() {
+  connection.connect(function(err){
+    if(err){
+      console.log(err)
+    } 
+    console.log("Re connected")
+  });
+}, 10000); // Wait for 10 seconds
+}
+
+connection.on('end', function(err){
+  console.log("Connection ended, reinitializing connection");
+  reconnectDb();
+})
+
+connection.on('error', function(err){
+  console.log("Connection Error occured, reinitializing connection");
+  reconnectDb();
+})
+
 
 // app.get('/',
 //   (req, res, next) => {
@@ -87,6 +110,10 @@ connection.on('connect', function(err) {
 //     res.redirect('/home');
 //   }
 // );
+app.get('/api/end',(req,res)=>{
+  connection.close();
+  res.send("Connection closed");
+})
 
 app.get('/api/players',(req,res)=>{
 
