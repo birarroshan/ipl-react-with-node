@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const logger = require('morgan');
 const { type } = require('os');
 const { json } = require('body-parser');
+const webPush = require('web-push');
 
 
 function normalizePort(val) {
@@ -27,13 +28,14 @@ app.use(logger('dev'));
 app.use('/public', express.static('public'));
 
 const {expressCspHeader,SELF} = require('express-csp-header');
+const { match } = require('assert');
 
 //const app = express();
 
 app.use(expressCspHeader({
   directives: {
     'default-src': [SELF],
-    'connect-src': [SELF, "https://login.microsoftonline.com","https://myopenaieus.openai.azure.com/openai/deployments/mychatbot/chat/completions?api-version=2024-02-15-preview"],
+    'connect-src': [SELF, "https://login.microsoftonline.com","https://myopenaieus.openai.azure.com/openai/deployments/mychatbot/chat/completions"],
     // Add other directives as needed
   },
 }));
@@ -67,40 +69,129 @@ connection.connect(function(err){
   } 
   console.log("Checking")
 })
+subs = []
 
+var matchTeam1=""
+var matchTeam2=""
 //Attempt to connect and execute queries if connection goes through
 connection.on('connect', function(err) {
   if (err) {
     console.log("Error while connecting to DB",err);
   } else {
-    console.log("Successful connection");
+    console.log("Successful connection ");
+    
+    let d = new Date(Date.now());
+    let formattedDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    matchreq = new Request("select * from [dbo].[matches] where Mdate like '"+formattedDate+"' order by matchId DESC offset 0 rows fetch next 1 row only",
+     function(err, rowCount, rows) {
+      if (err) {
+          console.log(err)
+      } else {
+          console.log(rowCount + ' row(s) returned');
+      }
+     })
+     
+     matchreq.on('row', function(columns) {
+      columns.forEach(function(column) {
+          //console.log(column.metadata.colName);
+          if (column.metadata.colName === 'matchID') {
+              console.log('Match ID found '+column.value);
+              matchID = column.value;
+          } if (column.metadata.colName === 'team1') {
+            console.log('Team 1 found '+column.value);
+            matchTeam1 = column.value;
+          } if (column.metadata.colName === 'team2') {
+            console.log('Team 2 found '+column.value);
+            matchTeam2 = column.value;
+          }
+      });
+      //console.log(result);
+      // result = "";
+     });
+
+     connection.execSql(matchreq)
+     setTimeout(subscriptionRequest, 5000);
 
   }
 });
 
-function reconnectDb() {
+async function subscriptionRequest(){
+  console.log("Subscription request")
+  subreq = new Request("select * from [dbo].[subscriptions]",
+     function(err, rowCount, rows) {
+      if (err) {
+          console.log(err)
+      } else {
+          console.log(rowCount + ' row(s) returned');
+      }
+     })
+     
+     subreq.on('row', function(columns) {
+      var subObject = {}
+      subObject.expirationTime= null
+      subObject.keys = {}
+      columns.forEach(function(column) {
+        console.log(column.metadata.colName + " : " + column.value);
+          if (column.metadata.colName === 'endpoint') {
+              subObject.endpoint = column.value;
+          } 
+          if(column.metadata.colName === 'auth'){
+            subObject.keys.auth = column.value;
+          }
+          if(column.metadata.colName === 'p256dh'){
+            subObject.keys.p256dh = column.value;
+          }
+      });
+      
+      subs.push(subObject);
+      // result = "";
+     });
+     connection.execSql(subreq);
+
+}
+
+function reconnectDb(timeout) {
   connection = new Connection(config);
 
 setTimeout(function() {
+  if(connection.connected) {
+    console.log("Connection is already established");
+    return};
   connection.connect(function(err){
     if(err){
       console.log(err)
     } 
     console.log("Re connected")
   });
-}, 10000); // Wait for 10 seconds
+}, timeout); // Wait for 10 seconds
 }
 
 connection.on('end', function(err){
   console.log("Connection ended, reinitializing connection");
-  reconnectDb();
+  reconnectDb(100);
 })
 
 connection.on('error', function(err){
   console.log("Connection Error occured, reinitializing connection");
-  reconnectDb();
+  reconnectDb(10000);
 })
 
+app.get('/api/end',(req,res)=>{
+  connection.close();
+  res.send("Connection closed");
+})
+
+app.get('/api/db',(req,res)=>{
+  reconnectDb(1);
+  res.send("Connection restarted");
+})
+
+// Configure VAPID keys
+webPush.setVapidDetails(
+  'mailto:roshan.birar@microsoft.com',
+  'BGQnf5Xe5PXvLwVLjoQpeO6WKdTB9oYs2E-DQEstSaXXTD0RExIrP1YUA3W2fGf9Un0Re3Rx_SIhUdJ3uJudxS4',
+  'Nim6fzW67Og-2wGMC0EQ3gbyGAkf8HDpUh-5EtloXOo'
+);
 
 // app.get('/',
 //   (req, res, next) => {
@@ -110,6 +201,54 @@ connection.on('error', function(err){
 //     res.redirect('/home');
 //   }
 // );
+
+
+// Route for saving subscription details
+app.post('/api/save-subscription', (req, res) => {
+  const subscription = req.body;
+  // Save subscription to your database
+  // ...
+  console.log("Subscription received ",subscription);
+  var subreq = 'INSERT INTO dbo.subscriptions values(\''+subscription.endpoint+'\',\''+subscription.keys.auth+'\',\''+subscription.keys.p256dh+'\')';
+  if(subs.some(item=>item.endpoint == subscription.endpoint)){
+    console.log("Duplicate subscription");
+    subreq = 'UPDATE dbo.subscriptions set auth = \''+subscription.keys.auth+'\', p256dh = \''+subscription.keys.p256dh+'\' where endpoint = \''+subscription.endpoint+'\'';
+  }
+  
+  connection.execSql(new Request(subreq, function(err, rowCount, rows) {
+    if(err){
+      console.log(err)
+      res.sendStatus(400)
+    }else{
+      console.log("Subscription saved successfully in DB")
+      subs.push(subscription);
+      res.status(200).json({ message: 'Subscription saved successfully' });
+    }
+  }))
+  console.log(subs.length);
+});
+
+// Route for sending notifications
+app.get('/send-notification', (req, res) => {
+  const notificationPayload = {
+    title: matchTeam1 + ' vs ' + matchTeam2,
+    body: "Vote for your favorite IPL player for today's match."
+    
+    //icon: '/path/to/your/icon.png', // Path to your notification icon
+  };
+  for (let i = 0; i < subs.length; i++) {
+    console.log("Sending notification to ",subs[i].endpoint,subs[i].keys.auth,subs[i].keys.p256dh);
+    webPush.sendNotification(subs[i], JSON.stringify(notificationPayload))
+      .catch((err) => {
+        console.error('Error sending notification, reason: ', err);
+      });
+  }
+  // Send notification to subscribed clients
+  // ...
+  //webPush.sendNotification(notificationPayload);
+  res.status(200).json({ message: 'Notification sent successfully' });
+});
+
 app.get('/api/end',(req,res)=>{
   connection.close();
   res.send("Connection closed");
@@ -192,9 +331,8 @@ if(entries.length == 0){
 })
 // Dummy change
 
-var matchID = parseInt("1")
-var matchTeam1 = ""
-var matchTeam2 = ""
+//var matchID = parseInt("1")
+
 app.get('/api/matches',(req,res)=>{
   if (matchTeam1 == "" ){
     var result = "";
@@ -202,18 +340,7 @@ app.get('/api/matches',(req,res)=>{
       
     var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
     console.log(query);
-    // sql.connect(configms).then(pool => {
-    //   // Query
-    //   return sql.query(query)
-    // }).then(result => {
-    //   console.log(result)
-    //   console.log("Match ID fetched",result.recordset[0].matchID)
-    //   matchTeam1 = result.recordset[0].team1
-    //   matchTeam2 = result.recordset[0].team2
-    //   res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
-    // }).catch(err => {
-    //  console.log("Error occuerred", err)
-    // });
+  
     requestGetM = new Request(
       query,
       function(err, rowCount, rows) {
@@ -256,6 +383,7 @@ app.get('/api/matches',(req,res)=>{
 
 var  entries = []
 app.use(express.static(path.join(__dirname, 'build')));
+//app.use(express.static(path.join(__dirname, 'src')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
@@ -410,6 +538,12 @@ app.post('/api/entries',(req,res) =>{
   
    //res.send(entries);
 })
+
+// app.get("/service-worker.js", (req, res) => {
+//   res.header( {
+//     'Content-Type': 'application/javascript'
+//   }).sendFile(path.resolve(__dirname,"src", "serviceWorker.js"));
+// });
 
 const port = normalizePort(process.env.PORT || 3000);
 app.listen(port, () => {

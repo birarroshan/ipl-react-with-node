@@ -15,8 +15,8 @@ import EntryForm from './components/EntryForm';
 //import React, { useState } from 'react';
 
 import { PageLayout } from './components/PageLayout';
-import { loginRequest } from './auth';
-import { callMsGraph } from './graph';
+import { NotificationComponent} from './components/NotificationComponent';
+
 
 import { AuthenticatedTemplate, UnauthenticatedTemplate, useMsal } from '@azure/msal-react';
 
@@ -128,6 +128,7 @@ function App() {
     <PageLayout class="App">
     <div className="App">
         <AuthenticatedTemplate>
+          <NotificationComponent/>
         <ProfileContent className="App-table"/>
       <div className="App-body" id="maintable" /*style={{display: "none" }}*/>
         <div id='help' className="App-model" style={{display: "none" }}>
@@ -286,8 +287,8 @@ class MainTable extends React.Component {
     // console.log("Entries",entries)
      const tableEntries = entries.map((entry,i)=>
       {
-        console.log(entry);
-      return <tr key={i}><td>{entry.name.replace('_', ' ')}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>{entry.score}</td> </tr>
+        //console.log(entry);
+      return <tr key={i}><td>{entry.name.replace(/_/g, ' ')}</td><td>{ (entry.team === "" ) ? "" : ( props.entries.showVotes ? entry.team :"Voted")} </td><td>{entry.score}</td> </tr>
       }
      )
     
@@ -297,9 +298,9 @@ class MainTable extends React.Component {
   } 
 
   formSubmit = (name,team) =>{
-    name = userName.replace(' ','_')
+    name = userName.replace(/ /g,'_')
     team = team.trim()
-    console.log("Before",this.state);
+    //console.log("Before",this.state);
     //  const entries = this.state.ent;
     var date = new Date();
     if (date.getHours()<19 ){
