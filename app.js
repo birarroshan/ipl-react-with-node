@@ -28,7 +28,7 @@ app.use(logger('dev'));
 app.use('/public', express.static('public'));
 
 const {expressCspHeader,SELF} = require('express-csp-header');
-const { match } = require('assert');
+
 
 //const app = express();
 
@@ -37,6 +37,7 @@ app.use(expressCspHeader({
     'default-src': [SELF],
     'connect-src': [SELF, "https://login.microsoftonline.com","https://myopenaieus.openai.azure.com/openai/deployments/mychatbot/chat/completions"],
     // Add other directives as needed
+    'img-src': ['data:', SELF] 
   },
 }));
 
@@ -70,48 +71,53 @@ connection.connect(function(err){
   console.log("Checking")
 })
 subs = []
-
+var matchID = 0
 var matchTeam1=""
 var matchTeam2=""
+
+async function initializeMatch(){
+  
+  let d = new Date(Date.now());
+  let formattedDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  matchreq = new Request("select * from [dbo].[matches] where Mdate like '"+formattedDate+"' order by matchId DESC offset 0 rows fetch next 1 row only",
+   function(err, rowCount, rows) {
+    if (err) {
+        console.log(err)
+    } else {
+        console.log(rowCount + ' row(s) returned');
+    }
+   })
+   
+   matchreq.on('row', function(columns) {
+    columns.forEach(function(column) {
+        //console.log(column.metadata.colName);
+        if (column.metadata.colName === 'matchID') {
+            console.log('Match ID found '+column.value);
+            matchID = column.value;
+        } if (column.metadata.colName === 'team1') {
+          console.log('Team 1 found '+column.value);
+          matchTeam1 = column.value;
+        } if (column.metadata.colName === 'team2') {
+          console.log('Team 2 found '+column.value);
+          matchTeam2 = column.value;
+        }
+    });
+    //console.log(result);
+    // result = "";
+   });
+
+   connection.execSql(matchreq)
+}
+
+
 //Attempt to connect and execute queries if connection goes through
 connection.on('connect', function(err) {
   if (err) {
     console.log("Error while connecting to DB",err);
   } else {
     console.log("Successful connection ");
-    
-    let d = new Date(Date.now());
-    let formattedDate = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    matchreq = new Request("select * from [dbo].[matches] where Mdate like '"+formattedDate+"' order by matchId DESC offset 0 rows fetch next 1 row only",
-     function(err, rowCount, rows) {
-      if (err) {
-          console.log(err)
-      } else {
-          console.log(rowCount + ' row(s) returned');
-      }
-     })
-     
-     matchreq.on('row', function(columns) {
-      columns.forEach(function(column) {
-          //console.log(column.metadata.colName);
-          if (column.metadata.colName === 'matchID') {
-              console.log('Match ID found '+column.value);
-              matchID = column.value;
-          } if (column.metadata.colName === 'team1') {
-            console.log('Team 1 found '+column.value);
-            matchTeam1 = column.value;
-          } if (column.metadata.colName === 'team2') {
-            console.log('Team 2 found '+column.value);
-            matchTeam2 = column.value;
-          }
-      });
-      //console.log(result);
-      // result = "";
-     });
-
-     connection.execSql(matchreq)
-     setTimeout(subscriptionRequest, 5000);
-
+    initializeMatch()
+    //setTimeout(subscriptionRequest, 5000);
   }
 });
 
@@ -228,25 +234,40 @@ app.post('/api/save-subscription', (req, res) => {
   console.log(subs.length);
 });
 
-// Route for sending notifications
-app.get('/send-notification', (req, res) => {
-  const notificationPayload = {
-    title: matchTeam1 + ' vs ' + matchTeam2,
-    body: "Vote for your favorite IPL player for today's match."
-    
-    //icon: '/path/to/your/icon.png', // Path to your notification icon
-  };
+async function sendNotification( dataToSend) {
+  let count = subs.length;
   for (let i = 0; i < subs.length; i++) {
     console.log("Sending notification to ",subs[i].endpoint,subs[i].keys.auth,subs[i].keys.p256dh);
-    webPush.sendNotification(subs[i], JSON.stringify(notificationPayload))
+    webPush.sendNotification(subs[i], JSON.stringify(dataToSend))
       .catch((err) => {
+        count = count - 1
         console.error('Error sending notification, reason: ', err);
       });
   }
-  // Send notification to subscribed clients
-  // ...
-  //webPush.sendNotification(notificationPayload);
-  res.status(200).json({ message: 'Notification sent successfully' });
+  return count
+  }
+
+
+
+app.get('/api/subs',(req,res)=>{
+  res.send(subs.length);
+})
+
+// Route for sending notifications
+app.get('/send-notification/:msg', (req, res) => {
+  var msg = req.params.msg;
+  if(msg === 'send'){
+    msg ="Vote for your favorite IPL team for today's match."
+  }
+  const notificationPayload = {
+    title: matchTeam1 + ' vs ' + matchTeam2,
+    body: msg
+  };
+  
+  sendNotification(notificationPayload).then((count) => {
+ 
+  res.status(200).json({ message: 'Notification sent successfully '+ count});
+  })
 });
 
 app.get('/api/end',(req,res)=>{
@@ -333,46 +354,11 @@ if(entries.length == 0){
 
 //var matchID = parseInt("1")
 
-app.get('/api/matches',(req,res)=>{
+app.get('/api/matches',async (req,res)=>{
   if (matchTeam1 == "" ){
-    var result = "";
-    d = new Date(Date.now())
-      
-    var query = 'SELECT matchID,team1,team2 FROM dbo.matches where MatchID = \''+ matchID+'\';';
-    console.log(query);
-  
-    requestGetM = new Request(
-      query,
-      function(err, rowCount, rows) {
-      if (err) {
-          console.log(err)
-          res.sendStatus(400)
-      } else {
-          console.log(rowCount + ' row(s) returned');
-          teams = result.split(" ");
-          // matchID = teams[0];
-           matchTeam1 = teams[1]
-           matchTeam2 = teams[2]
-          res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
-      }
-      });
-      
-      requestGetM.on('row', function(columns) {
-          columns.forEach(function(column) {
-              if (column.value === null) {
-                  console.log('NULL');
-              } else {
-                  result += column.value + " ";
-              }
-          });
-          console.log(result);
-          // result = "";
-      });
-  
-      // Execute SQL statement
-     
-        connection.execSql(requestGetM);
- 
+    await initializeMatch()
+    setTimeout(()=>{res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2})},2000)
+    
   }else{
     res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
   }
@@ -437,6 +423,11 @@ app.get('/api/submit/:winner',(req,res)=>{
           });
          connection.execSql(requestInsert);
   
+})
+
+app.get('/api/match',(req,res)=>{
+  initializeMatch()
+  res.send({ matchID : matchID,team1 : matchTeam1,team2 :matchTeam2});
 })
 
 app.get('/api/matchid/:match_id',(req,res)=>{

@@ -1,9 +1,12 @@
+import nicon from './noticon.jpg'
+import gif from './notiimage.webp'
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-unused-expressions */
 /* global self */
 /* global clients */
 // eslint-disable-next-line no-restricted-globals
 self.__WB_MANIFEST;
+
 
 const urlBase64ToUint8Array = base64String => {
     const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -34,6 +37,7 @@ const saveSubscription = async (subscription) => {
 
 self.addEventListener("install", async (e) => {
     console.log("SW Installed")
+    self.skipWaiting()
 })
 
 
@@ -65,7 +69,7 @@ self.addEventListener("push", e => {
     console.log("SW recieved Push",e)
     var data = e.data.json()
     try{
-    self.registration.showNotification(data.title, { body: data.body })
+    self.registration.showNotification(data.title, { body: data.body, icon: nicon, image: gif, badge: nicon,  actions: [{ action: 'https://dmoipl.azurewebsites.net/', title: 'Open' }] })
     }catch(err){
         console.log("Error while SHow Notification",err)
     }
