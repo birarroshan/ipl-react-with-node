@@ -1,5 +1,5 @@
 import nicon from './noticon.jpg'
-import gif from './notiimage.webp'
+import gif from './notiimage.png'
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-unused-expressions */
 /* global self */

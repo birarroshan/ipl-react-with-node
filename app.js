@@ -117,7 +117,7 @@ connection.on('connect', function(err) {
   } else {
     console.log("Successful connection ");
     initializeMatch()
-    //setTimeout(subscriptionRequest, 5000);
+    setTimeout(subscriptionRequest, 5000);
   }
 });
 
@@ -177,10 +177,6 @@ connection.on('end', function(err){
   reconnectDb(100);
 })
 
-connection.on('error', function(err){
-  console.log("Connection Error occured, reinitializing connection");
-  reconnectDb(10000);
-})
 
 app.get('/api/end',(req,res)=>{
   connection.close();
@@ -247,10 +243,8 @@ async function sendNotification( dataToSend) {
   return count
   }
 
-
-
 app.get('/api/subs',(req,res)=>{
-  res.send(subs.length);
+  subscriptionRequest().then(()=>{res.send(subs.length)});
 })
 
 // Route for sending notifications
