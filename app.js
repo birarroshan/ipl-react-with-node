@@ -8,7 +8,7 @@ const logger = require('morgan');
 const { type } = require('os');
 const { json } = require('body-parser');
 const webPush = require('web-push');
-
+const cron = require('node-cron');
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -28,6 +28,7 @@ app.use(logger('dev'));
 app.use('/public', express.static('public'));
 
 const {expressCspHeader,SELF} = require('express-csp-header');
+const {cronJobTiming } = require('./server/cronjob');
 
 
 //const app = express();
@@ -257,7 +258,7 @@ app.get('/send-notification/:msg', (req, res) => {
     title: matchTeam1 + ' vs ' + matchTeam2,
     body: msg
   };
-  
+
   sendNotification(notificationPayload).then((count) => {
  
   res.status(200).json({ message: 'Notification sent successfully '+ count});
@@ -529,6 +530,36 @@ app.post('/api/entries',(req,res) =>{
 //     'Content-Type': 'application/javascript'
 //   }).sendFile(path.resolve(__dirname,"src", "serviceWorker.js"));
 // });
+
+
+function PushNotificationMessage(msg, title){
+  const notificationPayload = {
+    title: title,
+    body: msg
+  };
+  sendNotification(notificationPayload).then((count) => {
+    console.log("Notification sent successfully ",count);
+  })
+}
+
+const cronPushNotificationTask = () => {
+
+  const title = matchTeam1 + ' vs ' + matchTeam2;
+  const msg = "Vote for your favorite IPL team for today's match."
+  PushNotificationMessage(msg,title)
+}
+
+console.log("---------------------cronJobTiming---------------------");
+console.log(cronJobTiming);
+
+cronJobTiming.forEach((time) => {
+  cron.schedule(time, () => {
+    cronPushNotificationTask();
+  }, 
+  {
+    scheduled: true, timezone: 'Asia/Kolkata'
+  });
+});
 
 const port = normalizePort(process.env.PORT || 3000);
 app.listen(port, () => {
