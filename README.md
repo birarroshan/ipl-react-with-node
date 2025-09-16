@@ -1,6 +1,144 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-For Internal Use only
-## Available Scripts
+# IPL Play-Along Application
+
+A comprehensive React-based application for IPL (Indian Premier League) fans to participate in match predictions, live voting, and real-time notifications during cricket matches. This application integrates with Azure services for AI-powered chat functionality, secure authentication, and push notifications.
+
+## 🏏 Features
+
+- **Live Match Voting**: Real-time team prediction and voting system
+- **Push Notifications**: Web push notifications for match updates and reminders
+- **AI Chat Integration**: Azure OpenAI-powered chat functionality for match discussions
+- **User Authentication**: Secure Azure AD integration for user management
+- **Score Tracking**: Dynamic leaderboard and scoring system
+- **Real-time Updates**: Live match data and statistics
+- **Responsive Design**: Mobile-friendly interface with React components
+
+## 📋 Table of Contents
+
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+- [Technologies](#technologies)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
+- [License](#license)
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 16+ and npm
+- Azure SQL Database access
+- Azure OpenAI service account
+- Azure AD application registration
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd ipl-react-with-node
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Configure environment variables (see [Configuration Guide](docs/DEVELOPMENT.md#environment-configuration))
+
+4. Start development server:
+```bash
+npm start
+```
+
+The application will open at [http://localhost:3000](http://localhost:3000)
+
+## 📖 Documentation
+
+Our comprehensive documentation is organized into specialized guides:
+
+### Core Documentation
+- **[Frontend Documentation](docs/FRONTEND.md)** - Complete React frontend architecture, components, and features
+- **[Development Guide](docs/DEVELOPMENT.md)** - Setup instructions, coding standards, and best practices
+- **[Database Documentation](docs/DATABASE.md)** - Azure SQL database schema, queries, and data management
+
+### Service Integration
+- **[Azure Integration Guide](docs/AZURE.md)** - Azure AD, OpenAI, and cloud services configuration
+- **[Notifications System](docs/NOTIFICATIONS.md)** - Web push notifications and service worker implementation
+
+### Operations & Security
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment, CI/CD, and infrastructure
+- **[Development Guide](docs/DEVELOPMENT.md)** - Setup instructions, coding standards, and best practices
+- **[Security Documentation](docs/SECURITY.md)** - Security measures, authentication, and data protection
+
+Each documentation file contains:
+- ✅ Detailed technical specifications
+- 🔧 Configuration examples
+- 🛠️ Troubleshooting guides
+- 📝 Code samples and best practices
+- 🚨 Common issues and solutions
+
+## 🛠️ Technologies
+
+### Frontend
+- **React 18.2.0** - Modern UI library with hooks
+- **Microsoft Authentication Library (MSAL)** - Azure AD integration
+- **Service Workers** - Push notifications and offline support
+- **CSS Modules** - Scoped styling and component-based design
+
+### Backend
+- **Express.js 4.18.2** - RESTful API server
+- **Tedious** - Azure SQL Database connectivity
+- **Web-Push** - Push notification delivery
+- **Helmet** - Security middleware and headers
+
+### Azure Services
+- **Azure SQL Database** - Primary data storage
+- **Azure OpenAI** - AI chat functionality
+- **Azure AD** - Authentication and user management
+- **Azure App Service** - Application hosting
+- **Azure Application Insights** - Monitoring and analytics
+
+## 🏗️ Architecture
+
+```mermaid
+graph TB
+    subgraph "Frontend (React)"
+        A[User Interface]
+        B[Authentication]
+        C[Push Notifications]
+        D[Chat Integration]
+    end
+    
+    subgraph "Backend (Express.js)"
+        E[API Routes]
+        F[Database Layer]
+        G[Push Service]
+        H[Authentication Middleware]
+    end
+    
+    subgraph "Azure Services"
+        I[Azure SQL Database]
+        J[Azure OpenAI]
+        K[Azure AD]
+        L[App Service]
+    end
+    
+    A --> E
+    B --> K
+    C --> G
+    D --> J
+    E --> F
+    F --> I
+    G --> C
+    H --> K
+    
+    L -.-> E
+    L -.-> A
+```
+
+## 🎯 Available Scripts
+
+### Development
 
 In the project directory, you can run:
 
